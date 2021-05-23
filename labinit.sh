@@ -1,4 +1,7 @@
 #!/bin/sh
+
+## Created by Peter Hauck for lab build.
+
 sudo su
 setuser=$1
 TIMEZONE="Australia/Brisbane"

@@ -1,30 +1,32 @@
 #!/bin/sh
 
 ## Created by Peter Hauck for lab build.
-while getopts u:p:d:c:r:t o
+while getopts u:p:h:dc:rtn o
 do	case "$o" in
 	u)	setuser="$OPTARG";;
 	p)  setpasswd="$OPTARG";;
+	c)  certbotinst="$OPTARG";;
+	h)  sethostname="$OPTARG";;
+	n)  noupt="yes";;
 	d)	dockerinst="yes";;
-	c)  certbotinst=$OPTARG;;
 	t)  TIMEZONE="Australia/Brisbane";;
-	r)  rebooinst="yes";;
+	r)  rebootinst="yes";;
 	[?])	print >&2 "Usage: $0 [-u user] [-p passwd] [-d] [-c cloudflarednsapikey] [-r] ..."
 		exit 1;;
 	esac
 done
 
-
 # Add User
-if [ -z $setuser ]
-then 
+if [ ! -z ${setpasswd} ]
+then
+	echo "## Adding User $setuser ##" 
 	useradd $setuser --create-home --shell /bin/bash --groups sudo
 	echo "$setuser:$setpasswd" | chpasswd
 	# Set no sudo passwd
 	echo "$setuser ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
 fi
 
-if [ -z $TIMEZONE ]
+if [ ! -z ${TIMEZONE} ]
 then
 	# Set Timezone
 	echo "## Setting Timezone $TIMEZONE ##"
@@ -32,24 +34,41 @@ then
 	cp /usr/share/zoneinfo/${TIMEZONE} /etc/localtime
 fi
 
-# Update OS
-#apt update
-#apt upgrade -y
-
-# Install Base Packages
-#apt install certbot python3-certbot-dns-cloudflare nfs-common
-
-if [ -z $dockerinst ]
+if [ ! -z ${sethostname} ]
 then
-	echo "## Intsalling Docker ##"
-	curl -fsSL https://get.docker.com -o get-docker
-	sh get-docker.sh
-	groupadd docker
+	# Set Timezone
+	echo "## Setting Hostname $sethostname ##"
+	hostnamectl set-hostname $sethostname
+fi
+
+
+
+# Update OS
+if [ ! -z ${noupt} ]
+then
+	apt update
+	apt upgrade -y
+
+	# Install Base Packages
+	apt install certbot python3-certbot-dns-cloudflare nfs-common -y
+fi
+
+if [ ! -z ${dockerinst} ]
+then
+	echo "## Intsalling Docker $dockerinst ##"
+	curl -fsSL https://get.docker.com -o get-docker.sh
+	chmod +x get-docker.sh
+	./get-docker.sh
+	if [ -z ${setuser} ]
+	then 
+		echo "## No User set - please set with a -u option  ##"
+		exit
+	fi
 	usermod -aG docker $setuser
 fi
-if [ -z $rebootinst ]
+if [ ! -z ${rebootinst} ]
 then
-    echo "## Rebooting ##"
+	echo "## Rebooting $rebootinst ##"
 	sleep 3s
-	#reboot
+	reboot
 fi

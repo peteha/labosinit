@@ -12,6 +12,9 @@ do	case "$o" in
 	esac
 done
 
+apt update
+apt install nfs-common -y
+
 # Set FSTAB
 if [ ! -z ${hostname} ] && [ ! -z ${nasip} ] 
 then

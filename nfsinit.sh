@@ -13,16 +13,17 @@ do	case "$o" in
 done
 
 # Set FSTAB
-if [ ! -z ${sethostname} -a ! -z ${nasip} ] 
+if [ ! -z ${hostname} ] && [ ! -z ${nasip} ] 
 then
 	echo "## Setup Up Shares ##"
-	mkdir -R /nfs/media 
+	mkdir /nfs
+	mkdir /nfs/media 
 	echo "$nasip:/volume1/Media    /nfs/media   nfs auto,nofail,noatime,nolock,intr,tcp,users,x-systemd.automount,actimeo=1800 0 0" >> /etc/fstab
-	mkdir -R /nfs/pggbnet
+	mkdir /nfs/pggbnet
 	echo "$nasip:/volume1/pggbnet  /nfs/pggbnet    nfs auto,nofail,noatime,nolock,intr,tcp,users,x-systemd.automount,actimeo=1800 0 0" >> /etc/fstab
-	mkdir -R /nfs/images
+	mkdir /nfs/images
 	echo "$nasip:/volume1/Images   /nfs/images  nfs auto,nofail,noatime,nolock,intr,tcp,users,x-systemd.automount,actimeo=1800 0 0" >> /etc/fstab
-	mkdir -R /nfs/data
+	mkdir /nfs/data
 	echo "$nasip:/volume1/$hostname   /nfs/data  nfs auto,nofail,noatime,nolock,intr,tcp,users,x-systemd.automount,actimeo=1800 0 0" >> /etc/fstab
 	mount -a
 fi

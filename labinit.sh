@@ -41,6 +41,7 @@ fi
 
 if [ -z $dockerinst ]
 then
+	echo "## Intsalling Docker ##"
 	curl -fsSL https://get.docker.com -o get-docker
 	sh get-docker.sh
 	groupadd docker
@@ -48,5 +49,7 @@ then
 fi
 if [ -z $rebootinst ]
 then
-	reboot
+    echo "## Rebooting ##"
+	sleep 3s
+	#reboot
 fi

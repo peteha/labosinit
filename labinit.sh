@@ -1,17 +1,16 @@
 #!/bin/sh
 
 ## Created by Peter Hauck for lab build.
-while getopts u:p:h:dc:rtn o
+while getopts u:p:h:drtn o
 do	case "$o" in
 	u)	setuser="$OPTARG";;
 	p)  setpasswd="$OPTARG";;
-	c)  certbotinst="$OPTARG";;
 	h)  sethostname="$OPTARG";;
 	n)  noupt="yes";;
 	d)	dockerinst="yes";;
 	t)  TIMEZONE="Australia/Brisbane";;
 	r)  rebootinst="yes";;
-	[?])	print >&2 "Usage: $0 [-u user] [-p passwd] [-d] [-c cloudflarednsapikey] [-r] ..."
+	[?])	print >&2 "Usage: $0 [-u user] [-p passwd] [-d] [-r] ..."
 		exit 1;;
 	esac
 done

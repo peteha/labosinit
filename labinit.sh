@@ -41,17 +41,12 @@ then
 	hostnamectl set-hostname $sethostname
 fi
 
-
-
-# Update OS
-if [ ! -z ${noupt} ]
-then
-	apt update
-	apt upgrade -y
+apt update
+apt upgrade -y
 
 	# Install Base Packages
-	apt install certbot python3-certbot-dns-cloudflare nfs-common -y
-fi
+apt install certbot python3-certbot-dns-cloudflare nfs-common python3-pip -y
+
 
 if [ ! -z ${dockerinst} ]
 then

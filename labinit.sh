@@ -7,7 +7,7 @@ do	case "$o" in
 	p)  setpasswd="$OPTARG";;
 	d)	dockerinst="yes";;
 	c)  certbotinst=$OPTARG;;
-	r)  rebooinst="yes"
+	r)  rebooinst="yes";;
 	[?])	print >&2 "Usage: $0 [-u user] [-p passwd] [-d] [-c cloudflarednsapikey] [-r] ..."
 		exit 1;;
 	esac

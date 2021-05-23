@@ -13,7 +13,7 @@ do	case "$o" in
 done
 
 # Set FSTAB
-if [ ! -z ${sethostname} ] && [ ! -z ${nasip} ] 
+if [ ! -z ${sethostname} -a ! -z ${nasip} ] 
 then
 	echo "## Setup Up Shares ##"
 	mkdir -R /nfs/media 

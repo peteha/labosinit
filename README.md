@@ -1,6 +1,7 @@
 # Scripts to Build Ubuntu Hosts
 
 labinit.sh - Initial Host Setup Script
+
 nfsinit.sh - mount NFS Share to lab server
 
 ## Initial Host Setup

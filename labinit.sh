@@ -1,13 +1,14 @@
 #!/bin/sh
 
 ## Created by Peter Hauck for lab build.
-while getopts u:p:h:drtn o
+while getopts u:p:h:drtnm o
 do	case "$o" in
 	u)	setuser="$OPTARG";;
 	p)  setpasswd="$OPTARG";;
 	h)  sethostname="$OPTARG";;
 	n)  noupt="yes";;
 	d)	dockerinst="yes";;
+	m)  netdata="yes";;
 	t)  TIMEZONE="Australia/Brisbane";;
 	r)  rebootinst="yes";;
 	[?])	print >&2 "Usage: $0 [-u user] [-p passwd] [-d] [-r] ..."
@@ -59,6 +60,11 @@ then
 		exit
 	fi
 	usermod -aG docker $setuser
+fi
+if [ ! -z ${netdata} ]
+then
+	echo "## Installing Netdata $netdata ##"
+    bash <(curl -Ss https://my-netdata.io/kickstart.sh)
 fi
 if [ ! -z ${rebootinst} ]
 then

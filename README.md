@@ -12,6 +12,7 @@ labinit.sh
 	 -p <password> : Password for admin user
 	 -h <hostname> : hostname for device
 	 -t : Sets timezone to Australia/Brisbane
+	 -m : Install NetData monitoring
 	 -d : Install docker - requires usename
 	 -r : reboot host at the end of the process
 

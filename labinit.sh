@@ -69,6 +69,7 @@ if [ ! -z ${netdata} ]
 then
 	echo "## Installing Netdata $netdata ##"
     bash <(curl -Ss https://my-netdata.io/kickstart.sh)
+
 fi
 if [ ! -z ${rebootinst} ]
 then

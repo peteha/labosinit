@@ -19,6 +19,7 @@ done
 
 # Add User
 if [ ! -a ${adduser} ]
+then
 	if [ ! -z ${setpasswd} ]
 	then
 		echo "## Adding User $setuser ##" 

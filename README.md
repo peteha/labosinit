@@ -8,12 +8,13 @@ nfsinit.sh - mount NFS Share to lab server
 
 labinit.sh
 
+	 -a : Add User requires Username and Password
 	 -u <username> : Username for admin user
 	 -p <password> : Password for admin user
 	 -h <hostname> : hostname for device
 	 -t : Sets timezone to Australia/Brisbane
 	 -m : Install NetData monitoring
-	 -d : Install docker - requires usename
+	 -d : Install docker - requires Username
 	 -r : reboot host at the end of the process
 
 Typical initial:

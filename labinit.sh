@@ -1,7 +1,7 @@
 #!/bin/sh
 
 ## Created by Peter Hauck for lab build.
-while getopts u:p:h:drtnm o
+while getopts u:p:h:drtnma o
 do	case "$o" in
 	u)	setuser="$OPTARG";;
 	p)  setpasswd="$OPTARG";;
@@ -11,19 +11,22 @@ do	case "$o" in
 	m)  netdata="yes";;
 	t)  TIMEZONE="Australia/Brisbane";;
 	r)  rebootinst="yes";;
+	a)  adduser="yes";;
 	[?])	print >&2 "Usage: $0 [-u user] [-p passwd] [-d] [-r] ..."
 		exit 1;;
 	esac
 done
 
 # Add User
-if [ ! -z ${setpasswd} ]
-then
-	echo "## Adding User $setuser ##" 
-	useradd $setuser --create-home --shell /bin/bash --groups sudo
-	echo "$setuser:$setpasswd" | chpasswd
-	# Set no sudo passwd
-	echo "$setuser ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+if [ ! -a ${adduser} ]
+	if [ ! -z ${setpasswd} ]
+	then
+		echo "## Adding User $setuser ##" 
+		useradd $setuser --create-home --shell /bin/bash --groups sudo
+		echo "$setuser:$setpasswd" | chpasswd
+		# Set no sudo passwd
+		echo "$setuser ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+	fi
 fi
 
 if [ ! -z ${TIMEZONE} ]

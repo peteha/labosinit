@@ -45,11 +45,11 @@ then
 	hostnamectl set-hostname $sethostname
 fi
 
-apt update
-apt upgrade -y
+#apt update
+#apt upgrade -y
 
 	# Install Base Packages
-apt install certbot python3-certbot-dns-cloudflare nfs-common python3-pip -y
+#apt install certbot python3-certbot-dns-cloudflare nfs-common python3-pip -y
 
 
 if [ ! -z ${dockerinst} ]

@@ -3,11 +3,11 @@
 ## Created by Peter Hauck for lab build.
 while getopts u:p:h:drtnma o
 do	case "$o" in
-	u)	setuser="$OPTARG";;
+	u)  setuser="$OPTARG";;
 	p)  setpasswd="$OPTARG";;
 	h)  sethostname="$OPTARG";;
 	n)  noupt="yes";;
-	d)	dockerinst="yes";;
+	d)  dockerinst="yes";;
 	m)  netdata="yes";;
 	t)  TIMEZONE="Australia/Brisbane";;
 	r)  rebootinst="yes";;
@@ -18,11 +18,11 @@ do	case "$o" in
 done
 
 # Add User
-if [ ! -a ${adduser} ]
+if [ ! -z ${adduser} ]
 then
 	if [ ! -z ${setpasswd} ]
 	then
-		echo "## Adding User $setuser ##" 
+		echo "## Adding User $setuser ##"
 		useradd $setuser --create-home --shell /bin/bash --groups sudo
 		echo "$setuser:$setpasswd" | chpasswd
 		# Set no sudo passwd
@@ -45,12 +45,13 @@ then
 	hostnamectl set-hostname $sethostname
 fi
 
-#apt update
-#apt upgrade -y
-
-	# Install Base Packages
-#apt install certbot python3-certbot-dns-cloudflare nfs-common python3-pip -y
-
+if [ -z ${noupt} ]
+then
+		apt update
+		apt upgrade -y
+		# Install Base Packages
+		apt install certbot python3-certbot-dns-cloudflare nfs-common python3-pip -y
+fi
 
 if [ ! -z ${dockerinst} ]
 then
@@ -65,12 +66,12 @@ then
 	fi
 	usermod -aG docker $setuser
 fi
-if [ ! -z ${netdata} ]
-then
-	echo "## Installing Netdata $netdata ##"
-    bash <(curl -Ss https://my-netdata.io/kickstart.sh)
-
-fi
+#if [ ! -z ${netdata} ]
+#then
+#	echo "## Installing Netdata $netdata ##"
+#        bash <(curl -Ss https://my-netdata.io/kickstart.sh)
+#
+#fi
 if [ ! -z ${rebootinst} ]
 then
 	echo "## Rebooting $rebootinst ##"

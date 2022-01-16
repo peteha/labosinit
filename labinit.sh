@@ -1,7 +1,7 @@
 #!/bin/sh
 
 ## Created by Peter Hauck for lab build.
-while getopts u:p:h:drtnma o
+while getopts u:p:h:drtnmak o
 do	case "$o" in
 	u)  setuser="$OPTARG";;
 	p)  setpasswd="$OPTARG";;

@@ -37,7 +37,7 @@ then
 	# Set Timezone
 	echo "## Setting Timezone $TIMEZONE ##"
 	echo $TIMEZONE > /etc/timezone
-	cp /usr/share/zoneinfo/${TIMEZONE} /etc/localtime
+	dpkg-reconfigure -f noninteractive tzdata
 fi
 
 if [ ! -z ${setk8param} ]
@@ -59,12 +59,12 @@ fi
 
 if [ ! -z ${sethostname} ]
 then
-	# Set Timezone
+	# Set Hostname
 	echo "## Setting Hostname $sethostname ##"
 	hostnamectl set-hostname $sethostname
 fi
 
-if [ -z ${noupt} ]
+if [ ! -z ${noupt} ]
 then
 		apt update
 		apt upgrade -y

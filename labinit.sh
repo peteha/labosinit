@@ -1,7 +1,7 @@
 #!/bin/sh
 
 ## Created by Peter Hauck for lab build.
-while getopts u:p:h:drtnmakw o
+while getopts u:p:h:drtnmakwf o
 do	case "$o" in
 	u)  setuser="$OPTARG";;
 	p)  setpasswd="$OPTARG";;
@@ -14,6 +14,7 @@ do	case "$o" in
 	a)  adduser="yes";;
 	k)  setk8param="yes";;
 	w)  nowireless="yes";;
+	f)  fixdhcp="yes";;
 	[?])	print >&2 "Usage: $0 [-u user] [-p passwd] [-d] [-r] ..."
 		exit 1;;
 	esac
@@ -62,6 +63,13 @@ then
 	# Set Hostname
 	echo "## Setting Hostname $sethostname ##"
 	hostnamectl set-hostname $sethostname
+fi
+
+if [ ! -z ${fixdhcp} ]
+then
+	# Fix DHCP Options
+	cat . 10-rpi-ethernet-eth0.yaml > /etc/netplan/10-rpi-ethernet-eth0.yaml
+	cat /etc/netplan/10-rpi-ethernet-eth0.yaml
 fi
 
 if [ ! -z ${noupt} ]

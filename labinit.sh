@@ -1,7 +1,7 @@
 #!/bin/sh
 
 ## Created by Peter Hauck for lab build.
-while getopts u:p:h:drtnmak o
+while getopts u:p:h:drtnmakw o
 do	case "$o" in
 	u)  setuser="$OPTARG";;
 	p)  setpasswd="$OPTARG";;
@@ -13,6 +13,7 @@ do	case "$o" in
 	r)  rebootinst="yes";;
 	a)  adduser="yes";;
 	k)  setk8param="yes";;
+	w)  nowireless="yes";;
 	[?])	print >&2 "Usage: $0 [-u user] [-p passwd] [-d] [-r] ..."
 		exit 1;;
 	esac
@@ -44,6 +45,15 @@ then
 	# K8 Parameters
 	echo "## Setting K8 Parameters ##"
     sudo sed -i -e 's/$/ cgroup_enable=memory cgroup_memory=1/' /boot/firmware/cmdline.txt
+	cat /boot/firmware/cmdline.txt
+fi
+
+if [ ! -z ${nowireless} ]
+then
+	# K8 Parameters
+	echo "## Setting Wireless Off ##"
+	echo "dtoverlay=disable-wifi" >> /boot/firmware/usercfg.txt
+	echo "dtoverlay=disable-bt" >> /boot/firmware/usercfg.txt
 	cat /boot/firmware/cmdline.txt
 fi
 

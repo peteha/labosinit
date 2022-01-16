@@ -12,6 +12,7 @@ do	case "$o" in
 	t)  TIMEZONE="Australia/Brisbane";;
 	r)  rebootinst="yes";;
 	a)  adduser="yes";;
+	k)  setk8param="yes";;
 	[?])	print >&2 "Usage: $0 [-u user] [-p passwd] [-d] [-r] ..."
 		exit 1;;
 	esac
@@ -36,6 +37,14 @@ then
 	echo "## Setting Timezone $TIMEZONE ##"
 	echo $TIMEZONE > /etc/timezone
 	cp /usr/share/zoneinfo/${TIMEZONE} /etc/localtime
+fi
+
+if [ ! -z ${setk8param} ]
+then
+	# K8 Parameters
+	echo "## Setting K8 Parameters ##"
+    sudo sed -i -e 's/$/ cgroup_enable=memory cgroup_memory=1/' /boot/firmware/cmdline.txt
+	cat /boot/firmware/cmdline.txt
 fi
 
 if [ ! -z ${sethostname} ]

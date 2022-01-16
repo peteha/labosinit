@@ -54,7 +54,7 @@ then
 	echo "## Setting Wireless Off ##"
 	echo "dtoverlay=disable-wifi" >> /boot/firmware/usercfg.txt
 	echo "dtoverlay=disable-bt" >> /boot/firmware/usercfg.txt
-	cat /boot/firmware/cmdline.txt
+	cat /boot/firmware/usercfg.txt
 fi
 
 if [ ! -z ${sethostname} ]

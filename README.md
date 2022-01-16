@@ -16,6 +16,8 @@ labinit.sh
 	 -n : No Update
 	 -d : Install docker - requires Username
 	 -r : reboot host at the end of the process
+	 -k : Add K8S options for Raspberry PI
+	 -w : Disable wireless and bluetooth - Raspberry Pi
 
 Typical initial:
 ```

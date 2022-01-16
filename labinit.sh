@@ -70,7 +70,7 @@ then
 	# Fix DHCP Options
 	cat $(dirname "$0")/10-rpi-ethernet-eth0.yaml > /etc/netplan/10-rpi-ethernet-eth0.yaml
 	cat /etc/netplan/10-rpi-ethernet-eth0.yaml
-	echo "/n"
+	echo "\n"
 fi
 
 if [ ! -z ${noupt} ]

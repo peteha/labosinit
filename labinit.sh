@@ -37,8 +37,7 @@ if [ ! -z ${TIMEZONE} ]
 then
 	# Set Timezone
 	echo "## Setting Timezone $TIMEZONE ##"
-	echo $TIMEZONE > /etc/timezone
-	dpkg-reconfigure -f noninteractive tzdata
+	timedatectl set-timezone $TIMEZONE
 fi
 
 if [ ! -z ${setk8param} ]

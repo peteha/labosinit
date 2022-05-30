@@ -36,6 +36,7 @@ fi
 if [ ! -z ${setsshkey} ]
 then
 	if [ ! -z ${setuser} ]
+	then
 		echo "## Setting SSH key for $setuser ##"
 		mkdir -p /home/$setuser/.ssh
 		echo "$setsshkey" >> /home/$setuser/.ssh/authorized_keys

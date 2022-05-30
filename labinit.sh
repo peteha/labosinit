@@ -30,8 +30,8 @@ then
 		echo "$setuser:$setpasswd" | chpasswd
 		# Set no sudo passwd
 		echo "$setuser ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
-		mkdir -p ~/.ssh
-		echo ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJZ9XR6ETVk9UkAd9glryFPO9TTLNiBx5y/11BC50QJZ peteha@Dreadnought.local >> ~/.ssh/authorized_keys
+		mkdir -p /home/$setuser/.ssh
+		echo ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJZ9XR6ETVk9UkAd9glryFPO9TTLNiBx5y/11BC50QJZ peteha@Dreadnought.local >> /home/$setuser/.ssh/authorized_keys
 	fi
 fi
 

@@ -33,6 +33,14 @@ then
 	fi
 fi
 
+if [ ! -z ${setsshkey} ]
+then
+	if [ ! -z ${setuser} ]
+		mkdir -p /home/$setuser/.ssh
+		echo "$setsshkey" >> /home/$setuser/.ssh/authorized_keys
+	fi
+fi
+
 if [ ! -z ${TIMEZONE} ]
 then
 	# Set Timezone
@@ -99,9 +107,4 @@ then
 	echo "## Rebooting $rebootinst ##"
 	sleep 3s
 	reboot
-fi
-if [ ! -z ${setsshkey} ]
-then
-		mkdir -p /home/$setuser/.ssh
-		echo "$setsshkey" >> /home/$setuser/.ssh/authorized_keys
 fi

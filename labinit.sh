@@ -25,7 +25,7 @@ if [ ! -z ${adduser} ]
 then
 	if [ ! -z ${setpasswd} ]
 	then
-		echo "## Adding User $setuser ##"
+		echo "## Adding User '$setuser' ##"
 		useradd $setuser --create-home --shell /bin/bash --groups sudo
 		echo "$setuser:$setpasswd" | chpasswd
 		# Set no sudo passwd
@@ -33,7 +33,7 @@ then
 	fi
 fi
 
-if [ ! -z ${setsshkey} ]
+if [ ! -z "${setsshkey}" ]
 then
 	if [ ! -z ${setuser} ]
 	then

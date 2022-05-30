@@ -1,14 +1,14 @@
 #!/bin/sh
 
 ## Created by Peter Hauck for lab build.
-while getopts u:p:h:drtnmakwf o
+while getopts u:p:h:s:drtnakwf o
 do	case "$o" in
 	u)  setuser="$OPTARG";;
 	p)  setpasswd="$OPTARG";;
 	h)  sethostname="$OPTARG";;
+	s)  setsshkey="$OPTARG";;
 	n)  noupt="yes";;
 	d)  dockerinst="yes";;
-	m)  netdata="yes";;
 	t)  TIMEZONE="Australia/Brisbane";;
 	r)  rebootinst="yes";;
 	a)  adduser="yes";;
@@ -29,9 +29,6 @@ then
 		useradd $setuser --create-home --shell /bin/bash --groups sudo
 		echo "$setuser:$setpasswd" | chpasswd
 		# Set no sudo passwd
-		echo "$setuser ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
-		mkdir -p /home/$setuser/.ssh
-		echo ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJZ9XR6ETVk9UkAd9glryFPO9TTLNiBx5y/11BC50QJZ peteha@Dreadnought.local >> /home/$setuser/.ssh/authorized_keys
 	fi
 fi
 
@@ -96,15 +93,15 @@ then
 	fi
 	usermod -aG docker $setuser
 fi
-#if [ ! -z ${netdata} ]
-#then
-#	echo "## Installing Netdata $netdata ##"
-#        bash <(curl -Ss https://my-netdata.io/kickstart.sh)
-#
-#fi
 if [ ! -z ${rebootinst} ]
 then
 	echo "## Rebooting $rebootinst ##"
 	sleep 3s
 	reboot
+fi
+if [ ! -z ${setsshkey} ]
+then
+		echo "$setuser ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+		mkdir -p /home/$setuser/.ssh
+		echo $setsshkey >> /home/$setuser/.ssh/authorized_keys
 fi

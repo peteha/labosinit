@@ -29,6 +29,7 @@ then
 		useradd $setuser --create-home --shell /bin/bash --groups sudo
 		echo "$setuser:$setpasswd" | chpasswd
 		# Set no sudo passwd
+		echo "$setuser ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
 	fi
 fi
 
@@ -101,7 +102,6 @@ then
 fi
 if [ ! -z ${setsshkey} ]
 then
-		echo "$setuser ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
 		mkdir -p /home/$setuser/.ssh
-		echo $setsshkey >> /home/$setuser/.ssh/authorized_keys
+		echo "$setsshkey" >> /home/$setuser/.ssh/authorized_keys
 fi

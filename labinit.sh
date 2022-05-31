@@ -1,57 +1,82 @@
-#!/bin/sh
+#!/bin/bash
 
-## Created by Peter Hauck for lab build.
-while getopts u:p:h:s:drtnakwf o
-do	case "$o" in
-	u)  setuser="$OPTARG";;
-	p)  setpasswd="$OPTARG";;
-	h)  sethostname="$OPTARG";;
-	s)  setsshkey="$OPTARG";;
-	n)  noupt="yes";;
-	d)  dockerinst="yes";;
-	t)  TIMEZONE="Australia/Brisbane";;
-	r)  rebootinst="yes";;
-	a)  adduser="yes";;
-	k)  setk8param="yes";;
-	w)  nowireless="yes";;
-	f)  fixdhcp="yes";;
-	[?])	print >&2 "Usage: $0 [-u user] [-p passwd] [-d] [-r] ..."
-		exit 1;;
-	esac
-done
+source hostbuild.env
+source .env
+cur_tz=`cat /etc/timezone`
 
-# Add User
-if [ ! -z ${adduser} ]
-then
-	if [ ! -z ${setpasswd} ]
+echo "## Setting Up Environment ##"
+echo
+## Create new User
+if id "$username" &>/dev/null; then
+    echo -n "Enter new password for $username (blank to leave the same): "
+    read -s passwd
+    newuser=""
+else
+    echo -n "Enter Password for $username: "
+    read -s passwd
+    newuser=True
+fi
+echo
+
+if [ ! -z ${newuser} ]
 	then
-		echo "## Adding User '$setuser' ##"
-		useradd $setuser --create-home --shell /bin/bash --groups sudo
-		echo "$setuser:$setpasswd" | chpasswd
+	    echo "## Adding User '$username' ##"
+		useradd $username --create-home --shell /bin/bash --groups sudo
+		echo "$username:$passwd" | sudo chpasswd
+fi
+if [[ "$sudoers" == "True" ]]
+    then
 		# Set no sudo passwd
-		echo "$setuser ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
-	fi
+        if grep -Fxq "$username ALL=(ALL) NOPASSWD: ALL" /etc/sudoers
+            then
+                echo "## Already SUDO ##"
+            else
+                echo "Set SUDO Happening for $username"
+                echo "$username ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+        fi
 fi
-
-if [ ! -z "${setsshkey}" ]
-then
-	if [ ! -z ${setuser} ]
-	then
-		echo "## Setting SSH key for $setuser ##"
-		mkdir -p /home/$setuser/.ssh
-		echo "$setsshkey" >> /home/$setuser/.ssh/authorized_keys
-		sudo chown $setuser:$setuser /home/$setuser/.ssh/authorized_keys 	
-	fi
+if [[ "$gitpk" == "True" ]]
+    then
+		gitpk_dl=`curl -s https://github.com/$username.keys`
+        if [[ $gitpk_dl != "Not Found" ]]
+        then
+            if grep -Fxq "$gitpk_dl" /home/$username/.ssh/authorized_keys
+                then
+                    echo "## Already in authorized_keys ##"
+                else
+                    echo "Adding authorized_keys for $username"
+                    mkdir -p /home/$username/.ssh
+                    echo "$gitpk_dl" >> /home/$username/.ssh/authorized_keys
+                    sudo chown $username:$username /home/$username/.ssh/authorized_keys
+            fi
+        else
+            echo "## No Keys in GitHub for $username ##"
+        fi
 fi
+echo
+echo
+echo "Username will be:             $username"
+## Hostname Setup
+if [[ "$buildhostname" != "$HOSTNAME" ]]
+    then
+        echo "## Setting Hostname $buildhostname ##"
+	    #hostnamectl set-hostname $buildhostname
+    else
+        buildhostname=$"$HOSTNAME"
+    fi
+echo "Hostname will be:             $buildhostname"
+sed -i.bak "/buildhostname=/c\buildhostname=$buildhostname" hostbuild.env && rm hostbuild.env.bak
 
-if [ ! -z ${TIMEZONE} ]
-then
-	# Set Timezone
-	echo "## Setting Timezone $TIMEZONE ##"
-	timedatectl set-timezone $TIMEZONE
-fi
+if [[ "$cur_tz" != "$tz" ]]
+    then
+        echo "## Setting Timezone $tz ##"
+	    #timedatectl set-timezone $tz
+    else
+        tz=$"$cur_tz"
+    fi
+echo "Timezone will be:             $tz"
 
-if [ ! -z ${setk8param} ]
+if [[ "$pik8s" == "True" ]]
 then
 	# K8 Parameters
 	echo "## Setting K8 Parameters ##"
@@ -59,71 +84,42 @@ then
 	cat /boot/firmware/cmdline.txt
 fi
 
-if [ ! -z ${nowireless} ]
+if [[ $createcert == "True" ]]
 then
-	# K8 Parameters
-	echo "## Setting Wireless Off ##"
-	echo "dtoverlay=disable-wifi" >> /boot/firmware/usercfg.txt
-	echo "dtoverlay=disable-bt" >> /boot/firmware/usercfg.txt
-	cat /boot/firmware/usercfg.txt
+    if [ ! -f /home/$username/cfcred/cf-api-token.ini ]
+    then
+        echo -n "Enter CloudFlare API Token: "
+        read cfapitoken
+		echo dns_cloudflare_api_token = "$cfapitoken" > /home/$username/cfcred/cf-api-token.ini
+		chmod 600 /home/$username/cfcred/cf-api-token.ini
+    fi
+    apt install certbot python3-certbot-dns-cloudflare python3-pip -y
+	if [ ! -z ${buildhostname} ]
+	then
+		echo "## Creating Key for Host $buildhostname"
+		mkdir -p /home/$username/cfcred
+        fullhn="$buildhostname.$domain"
+		sudo certbot certonly --dns-cloudflare --dns-cloudflare-credentials /home/$username/cfcred/cf-api-token.ini -d $fullhn -m $ssl_admin --agree-tos
+	fi
+fi
+# Install Cockpit
+if [[ $inst_cockpit == "True" ]]
+then
+    fullhn="$buildhostname.$domain"
+    apt install cockpit -y
+    if [ -f /etc/letsencrypt/live/$fullhn/fullchain.pem ]
+    then
+        echo "Copying certs for Cockpit"
+        bash -c "cat /etc/letsencrypt/live/$fullhn/fullchain.pem /etc/letsencrypt/live/$fullhn/privkey.pem >/etc/cockpit/ws-certs.d/$fullhn.cert"
+        systemctl stop cockpit.service
+        systemctl start cockpit.service
+    fi
 fi
 
-if [ ! -z ${noupt} ]
+if [[ $update == "True" ]]
 then
 		apt update
 		apt upgrade -y
 		# Install Base Packages
-		apt install certbot python3-certbot-dns-cloudflare nfs-common python3-pip cockpit -y
-fi
-
-if [ ! -z ${sethostname} ]
-then
-	if [! $sethostname == $HOSTNAME]
-	then
-		# Set Hostname
-		echo "## Setting Hostname $sethostname ##"
-		hostnamectl set-hostname $sethostname
-	fi
-	echo "##Hostname is the same - not setting it ##"
-fi
-
-if [ ! -z "${createcert}" ]
-then
-	if [ ! -z ${sethostname} ]
-	then
-		echo "## Creating Key for Host $sethostname"
-		mkdir -p ~/cfcred
-		echo dns_cloudflare_api_token = "$createcert" > ~/cfcred/cf-api-token.ini
-		chmod 600 ~/cfcred/cf-api-token.ini
-		sudo certbot certonly --dns-cloudflare --dns-cloudflare-credentials ~/cfcred/cf-api-token.ini -d *.pggb.net -m admin@pggb.net --agree-tos
-	fi
-fi
-
-if [ ! -z ${fixdhcp} ]
-then
-	# Fix DHCP Options
-	cat $(dirname "$0")/10-rpi-ethernet-eth0.yaml > /etc/netplan/10-rpi-ethernet-eth0.yaml
-	echo "## DHCP Options for MAC identifier added ##"
-	cat /etc/netplan/10-rpi-ethernet-eth0.yaml
-	echo "\n"
-fi
-
-if [ ! -z ${dockerinst} ]
-then
-	echo "## Intsalling Docker $dockerinst ##"
-	curl -fsSL https://get.docker.com -o get-docker.sh
-	chmod +x get-docker.sh
-	./get-docker.sh
-	if [ -z ${setuser} ]
-	then 
-		echo "## No User set - please set with a -u option  ##"
-		exit
-	fi
-	usermod -aG docker $setuser
-fi
-if [ ! -z ${rebootinst} ]
-then
-	echo "## Rebooting $rebootinst ##"
-	sleep 3s
-	reboot
+		apt install $inst_pkgs -y
 fi

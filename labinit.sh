@@ -40,6 +40,7 @@ then
 		echo "## Setting SSH key for $setuser ##"
 		mkdir -p /home/$setuser/.ssh
 		echo "$setsshkey" >> /home/$setuser/.ssh/authorized_keys
+		sudo chown $setuser:$setuser /home/$setuser/.ssh/authorized_keys 	
 	fi
 fi
 
@@ -67,11 +68,35 @@ then
 	cat /boot/firmware/usercfg.txt
 fi
 
+if [ ! -z ${noupt} ]
+then
+		apt update
+		apt upgrade -y
+		# Install Base Packages
+		apt install certbot python3-certbot-dns-cloudflare nfs-common python3-pip cockpit -y
+fi
+
 if [ ! -z ${sethostname} ]
 then
-	# Set Hostname
-	echo "## Setting Hostname $sethostname ##"
-	hostnamectl set-hostname $sethostname
+	if [! $sethostname == $HOSTNAME]
+	then
+		# Set Hostname
+		echo "## Setting Hostname $sethostname ##"
+		hostnamectl set-hostname $sethostname
+	fi
+	echo "##Hostname is the same - not setting it ##"
+fi
+
+if [ ! -z "${createcert}" ]
+then
+	if [ ! -z ${sethostname} ]
+	then
+		echo "## Creating Key for Host $sethostname"
+		mkdir -p ~/cfcred
+		echo dns_cloudflare_api_token = "$createcert" > ~/cfcred/cf-api-token.ini
+		chmod 600 ~/cfcred/cf-api-token.ini
+		sudo certbot certonly --dns-cloudflare --dns-cloudflare-credentials ~/cfcred/cf-api-token.ini -d *.pggb.net -m admin@pggb.net --agree-tos
+	fi
 fi
 
 if [ ! -z ${fixdhcp} ]
@@ -81,14 +106,6 @@ then
 	echo "## DHCP Options for MAC identifier added ##"
 	cat /etc/netplan/10-rpi-ethernet-eth0.yaml
 	echo "\n"
-fi
-
-if [ ! -z ${noupt} ]
-then
-		apt update
-		apt upgrade -y
-		# Install Base Packages
-		apt install certbot python3-certbot-dns-cloudflare nfs-common python3-pip cockpit -y
 fi
 
 if [ ! -z ${dockerinst} ]

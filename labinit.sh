@@ -7,7 +7,7 @@ cd ~/osbuild
 if [ ! -f hostbuild.env ]; then
     echo ## No hostbuild.env file available ##
     curl -fs https://raw.githubusercontent.com/peteha/labosinit/main/hostbuild.env --output hostbuild.env
-    apt install nano
+    sudo apt install nano
     nano hostbuild.env
 fi
 
@@ -38,12 +38,12 @@ fi
 if [[ "$sudoers" == "True" ]]
     then
 		# Set no sudo passwd
-        if grep -Fxq "$username ALL=(ALL) NOPASSWD: ALL" /etc/sudoers
+        if sudo grep -Fxq "$username ALL=(ALL) NOPASSWD: ALL" /etc/sudoers
             then
                 echo "## Already SUDO ##"
             else
                 echo "Set SUDO Happening for $username"
-                echo "$username ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+                sudo echo "$username ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
         fi
 fi
 if [[ "$gitpk" == "True" ]]
@@ -56,8 +56,8 @@ if [[ "$gitpk" == "True" ]]
                     echo "## Already in authorized_keys ##"
                 else
                     echo "Adding authorized_keys for $username"
-                    mkdir -p /home/$username/.ssh
-                    echo "$gitpk_dl" >> /home/$username/.ssh/authorized_keys
+                    sudo mkdir -p /home/$username/.ssh
+                    sudo echo "$gitpk_dl" >> /home/$username/.ssh/authorized_keys
                     sudo chown $username:$username /home/$username/.ssh/authorized_keys
             fi
         else
@@ -71,7 +71,7 @@ echo "Username will be:             $username"
 if [[ "$buildhostname" != "$HOSTNAME" ]]
     then
         echo "## Setting Hostname $buildhostname ##"
-	    #hostnamectl set-hostname $buildhostname
+	    sudo hostnamectl set-hostname $buildhostname
     else
         buildhostname=$"$HOSTNAME"
     fi
@@ -81,7 +81,7 @@ sed -i.bak "/buildhostname=/c\buildhostname=$buildhostname" hostbuild.env && rm 
 if [[ "$cur_tz" != "$tz" ]]
     then
         echo "## Setting Timezone $tz ##"
-	    #timedatectl set-timezone $tz
+	    sudo timedatectl set-timezone $tz
     else
         tz=$"$cur_tz"
     fi
@@ -104,7 +104,7 @@ then
 		echo dns_cloudflare_api_token = "$cfapitoken" > /home/$username/cfcred/cf-api-token.ini
 		chmod 600 /home/$username/cfcred/cf-api-token.ini
     fi
-    apt install certbot python3-certbot-dns-cloudflare python3-pip -y
+    sudo apt install certbot python3-certbot-dns-cloudflare python3-pip -y
 	if [ ! -z ${buildhostname} ]
 	then
 		echo "## Creating Key for Host $buildhostname"
@@ -117,20 +117,20 @@ fi
 if [[ $inst_cockpit == "True" ]]
 then
     fullhn="$buildhostname.$domain"
-    apt install cockpit -y
+    sudo apt install cockpit -y
     if [ -f /etc/letsencrypt/live/$fullhn/fullchain.pem ]
     then
         echo "Copying certs for Cockpit"
         bash -c "cat /etc/letsencrypt/live/$fullhn/fullchain.pem /etc/letsencrypt/live/$fullhn/privkey.pem >/etc/cockpit/ws-certs.d/$fullhn.cert"
-        systemctl stop cockpit.service
-        systemctl start cockpit.service
+        sudo systemctl stop cockpit.service
+        sudo systemctl start cockpit.service
     fi
 fi
 
 if [[ $update == "True" ]]
 then
-		apt update
-		apt upgrade -y
+		sudo apt update
+		sudo apt upgrade -y
 		# Install Base Packages
-		apt install $inst_pkgs -y
+		sudo apt install $inst_pkgs -y
 fi

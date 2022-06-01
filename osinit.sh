@@ -89,14 +89,6 @@ if [[ "$cur_tz" != "$tz" ]]
     fi
 echo "Timezone will be:             $tz"
 
-if [[ "$pik8s" == "True" ]]
-then
-	# K8 Parameters
-	echo "## Setting K8 Parameters ##"
-    sudo sed -i -e 's/$/ cgroup_enable=memory cgroup_memory=1/' /boot/firmware/cmdline.txt
-	cat /boot/firmware/cmdline.txt
-fi
-
 if [[ $createcert == "True" ]]
 then
     if [ ! -f /home/$username/cfcred/cf-api-token.ini ]

@@ -1,7 +1,18 @@
 #!/bin/bash
 
+mkdir -p ~/osbuild
+cd ~/osbuild
+## 
+
+if [ ! -f hostbuild.env ]; then
+    echo ## No hostbuild.env file available ##
+    curl -fs https://raw.githubusercontent.com/peteha/labosinit/main/hostbuild.env --output hostbuild.env
+    apt install nano
+    nano hostbuild.env
+fi
+
 source hostbuild.env
-source .env
+
 cur_tz=`cat /etc/timezone`
 
 echo "## Setting Up Environment ##"

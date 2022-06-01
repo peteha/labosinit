@@ -3,6 +3,8 @@
 mkdir -p ~/osbuild
 cd ~/osbuild
 ## 
+curl -fs https://raw.githubusercontent.com/peteha/labosinit/main/osinit.sh --output osinit.sh
+chmod +x osinit.sh
 
 if [ ! -f hostbuild.env ]; then
     echo ## No hostbuild.env file available ##

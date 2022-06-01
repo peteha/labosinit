@@ -95,6 +95,7 @@ then
     then
         echo -n "Enter CloudFlare API Token: "
         read cfapitoken
+        mkdir -p /home/$username/cfcred
 		echo dns_cloudflare_api_token = "$cfapitoken" > /home/$username/cfcred/cf-api-token.ini
 		chmod 600 /home/$username/cfcred/cf-api-token.ini
     fi
@@ -102,7 +103,7 @@ then
 	if [ ! -z ${buildhostname} ]
 	then
 		echo "## Creating Key for Host $buildhostname"
-		mkdir -p /home/$username/cfcred
+
         fullhn="$buildhostname.$domain"
 		sudo certbot certonly --dns-cloudflare --dns-cloudflare-credentials /home/$username/cfcred/cf-api-token.ini -d $fullhn -m $ssl_admin --agree-tos
 	fi

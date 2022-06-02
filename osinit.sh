@@ -129,13 +129,12 @@ then
     pkg_req="docker.io"
     pkg_chk=$(dpkg-query -W --showformat='${Status}\n' $pkg_req|grep "install ok installed")
     echo Checking for $pkg_req: $pkg_chk
-    if [ ! "" = "$PKG_OK" ]
+    if [ ! "" = "$pkg_chk" ]
     then
         apt remove docker docker-engine docker.io containerd runc
     fi
     if [ ! -x "$(command -v docker)" ]
     then
-        apt-get remove docker docker-engine docker.io containerd runc
         curl -fsSL https://get.docker.com -o get-docker.sh
         groupadd docker
         usermod -aG docker $username
@@ -143,13 +142,13 @@ then
 
     if [[ $inst_dockercompose == "True" ]]
     then
-        pkg_req="docker-compose-plugin"
+        pkg_req="docker-compose"
         pkg_chk=$(dpkg-query -W --showformat='${Status}\n' $pkg_req|grep "install ok installed")
         echo Checking for $pkg_req: $pkg_chk
         if [ "" = "$PKG_OK" ]
         then
             apt-get update
-            apt-get install docker-compose-plugin
+            apt-get install docker-compose
         fi
 
     fi

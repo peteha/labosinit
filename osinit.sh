@@ -133,13 +133,10 @@ then
     then
         apt remove docker docker-engine docker.io containerd runc
     fi
-    if [ ! -x "$(command -v docker)" ]
-    then
-        curl -fsSL https://get.docker.com -o get-docker.sh
-        groupadd docker
-        usermod -aG docker $username
-    fi
-
+    curl -fsSL https://get.docker.com -o get-docker.sh
+    groupadd docker
+    usermod -aG docker $username
+    
     if [[ $inst_dockercompose == "True" ]]
     then
         pkg_req="docker-compose"

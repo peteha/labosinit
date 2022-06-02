@@ -16,6 +16,7 @@ fi
 source hostbuild.env
 
 cur_tz=`cat /etc/timezone`
+fullhn="$buildhostname.$domain"
 
 echo "## Setting Up Environment ##"
 echo
@@ -103,15 +104,12 @@ then
 	if [ ! -z ${buildhostname} ]
 	then
 		echo "## Creating Key for Host $buildhostname"
-
-        fullhn="$buildhostname.$domain"
 		sudo certbot certonly --dns-cloudflare --dns-cloudflare-credentials /home/$username/cfcred/cf-api-token.ini -d $fullhn -m $ssl_admin --agree-tos
 	fi
 fi
 # Install Cockpit
 if [[ $inst_cockpit == "True" ]]
 then
-    fullhn="$buildhostname.$domain"
     sudo apt install cockpit -y
     if [ -f /etc/letsencrypt/live/$fullhn/fullchain.pem ]
     then
@@ -123,28 +121,24 @@ then
 fi
 
 # Install Docker
+
 if [[ $inst_docker == "True" ]]
-then
-    fullhn="$buildhostname.$domain"
-    pkg_req="docker.io"
-    pkg_chk=$(dpkg-query -W --showformat='${Status}\n' $pkg_req|grep "install ok installed")
-    echo Checking for $pkg_req: $pkg_chk
-    if [ ! "" = "$pkg_chk" ]
     then
-        apt remove docker docker-engine docker.io containerd runc
-    fi
-    echo ## Installing Docker ##
-    curl -sSL https://get.docker.com | sh
-    groupadd docker
-    usermod -aG docker $username
-    
+        if [[ $(which docker) && $(docker --version) ]]
+        then
+            echo "Docker installed"
+        else
+            echo "## Installing Docker ##"
+            curl -sSL https://get.docker.com | sh
+            groupadd docker
+            usermod -aG docker $username
+        fi
     if [[ $inst_dockercompose == "True" ]]
     then
-        pkg_req="docker-compose"
-        pkg_chk=$(dpkg-query -W --showformat='${Status}\n' $pkg_req|grep "install ok installed")
-        echo Checking for $pkg_req: $pkg_chk
-        if [ "" = "$pkg_chk" ]
+        if [ -x "$(command -v docker-compose)" ]
         then
+            echo "Docker compose installed"
+        else
             pip3 -q install docker-compose
         fi
 

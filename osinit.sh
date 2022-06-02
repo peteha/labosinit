@@ -145,8 +145,7 @@ then
         echo Checking for $pkg_req: $pkg_chk
         if [ "" = "$PKG_OK" ]
         then
-            apt-get update
-            apt-get install docker-compose
+            pip3 -q install docker-compose
         fi
 
     fi

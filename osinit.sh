@@ -143,7 +143,7 @@ then
         pkg_req="docker-compose"
         pkg_chk=$(dpkg-query -W --showformat='${Status}\n' $pkg_req|grep "install ok installed")
         echo Checking for $pkg_req: $pkg_chk
-        if [ "" = "$PKG_OK" ]
+        if [ "" = "$pkg_chk" ]
         then
             pip3 -q install docker-compose
         fi

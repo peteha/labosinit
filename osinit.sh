@@ -122,6 +122,48 @@ then
     fi
 fi
 
+# Install Docker
+if [[ $inst_docker == "True" ]]
+then
+    fullhn="$buildhostname.$domain"
+    pkg_req="docker.io"
+    pkg_chk=$(dpkg-query -W --showformat='${Status}\n' $pkg_req|grep "install ok installed")
+    echo Checking for $pkg_req: $pkg_chk
+    if [ ! "" = "$PKG_OK" ]
+    then
+        apt remove docker docker-engine docker.io containerd runc
+    fi
+    if [ ! -x "$(command -v docker)" ]
+    then
+        apt-get remove docker docker-engine docker.io containerd runc
+        curl -fsSL https://get.docker.com -o get-docker.sh
+        groupadd docker
+        usermod -aG docker $username
+    fi
+
+    if [[ $inst_dockercompose == "True" ]]
+    then
+        pkg_req="docker-compose-plugin"
+        pkg_chk=$(dpkg-query -W --showformat='${Status}\n' $pkg_req|grep "install ok installed")
+        echo Checking for $pkg_req: $pkg_chk
+        if [ "" = "$PKG_OK" ]
+        then
+            apt-get update
+            apt-get install docker-compose-plugin
+        fi
+
+    fi
+    if [ -f /etc/letsencrypt/live/$fullhn/fullchain.pem ]
+    then
+        echo "Copying certs for docker"
+        mkdir -p $docker_certdir
+        bash -c "cat /etc/letsencrypt/live/$fullhn/fullchain.pem /etc/letsencrypt/live/$fullhn/privkey.pem >$docker_certdir/$fullhn.cert"
+        bash -c "cat /etc/letsencrypt/live/$fullhn/fullchain.pem >$docker_certdir/$fullhn-fullchain.cert"
+        bash -c "cat /etc/letsencrypt/live/$fullhn/privkey.pem >$docker_certdir/$fullhn-privkey.key"
+        chown -R $username:$username $docker_certdir
+    fi
+fi
+
 if [[ $update == "True" ]]
 then
 		sudo apt update

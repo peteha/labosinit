@@ -105,11 +105,10 @@ then
 	then
 		echo "## Creating Key for Host $buildhostname"
         ssl_admin=$"$ssl_admin_pre$domain"
-        echo $ssl_admin
-		#sudo certbot certonly --dns-cloudflare --dns-cloudflare-credentials /home/$username/cfcred/cf-api-token.ini -d $fullhn -m $ssl_admin --agree-tos
+		sudo certbot certonly --dns-cloudflare --dns-cloudflare-credentials /home/$username/cfcred/cf-api-token.ini -d $fullhn -m $ssl_admin --agree-tos
 	fi
 fi
-# Install Cockpit ##
+# Install Cockpit #
 if [[ $inst_cockpit == "True" ]]
 then
     sudo apt install cockpit -y

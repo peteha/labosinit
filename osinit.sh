@@ -135,13 +135,7 @@ if [[ $inst_docker == "True" ]]
         fi
     if [[ $inst_dockercompose == "True" ]]
     then
-        if [ -x "$(command -v docker-compose)" ]
-        then
-            echo "Docker compose installed"
-        else
-            pip3 -q install docker-compose
-        fi
-
+        pip3 -q install docker-compose
     fi
     if [ -f /etc/letsencrypt/live/$fullhn/fullchain.pem ]
     then

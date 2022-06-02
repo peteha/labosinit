@@ -134,6 +134,7 @@ then
         apt remove docker docker-engine docker.io containerd runc
     fi
     curl -fsSL https://get.docker.com -o get-docker.sh
+    sh get-docker.sh
     groupadd docker
     usermod -aG docker $username
     

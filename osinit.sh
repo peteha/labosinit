@@ -106,6 +106,15 @@ then
 		echo "## Creating Key for Host $buildhostname"
         ssl_admin=$"$ssl_admin_pre$domain"
 		sudo certbot certonly --dns-cloudflare --dns-cloudflare-credentials /home/$username/cfcred/cf-api-token.ini -d $fullhn -m $ssl_admin --agree-tos
+        if [ -f /etc/letsencrypt/live/$fullhn/fullchain.pem ]
+        then
+            echo "Copying certs for docker"
+            mkdir -p $certdir
+            bash -c "cat /etc/letsencrypt/live/$fullhn/fullchain.pem /etc/letsencrypt/live/$fullhn/privkey.pem >$certdir/$fullhn.cert"
+            bash -c "cat /etc/letsencrypt/live/$fullhn/fullchain.pem >$certdir/$fullhn-fullchain.cert"
+            bash -c "cat /etc/letsencrypt/live/$fullhn/privkey.pem >$certdir/$fullhn-privkey.key"
+            chown -R $username:$username $certdir
+        fi
 	fi
 fi
 # Install Cockpit #
@@ -137,15 +146,6 @@ if [[ $inst_docker == "True" ]]
     if [[ $inst_dockercompose == "True" ]]
     then
         pip3 install docker-compose
-    fi
-    if [ -f /etc/letsencrypt/live/$fullhn/fullchain.pem ]
-    then
-        echo "Copying certs for docker"
-        mkdir -p $docker_certdir
-        bash -c "cat /etc/letsencrypt/live/$fullhn/fullchain.pem /etc/letsencrypt/live/$fullhn/privkey.pem >$docker_certdir/$fullhn.cert"
-        bash -c "cat /etc/letsencrypt/live/$fullhn/fullchain.pem >$docker_certdir/$fullhn-fullchain.cert"
-        bash -c "cat /etc/letsencrypt/live/$fullhn/privkey.pem >$docker_certdir/$fullhn-privkey.key"
-        chown -R $username:$username $docker_certdir
     fi
 fi
 

@@ -105,7 +105,7 @@ then
 	then
 		echo "## Creating Key for Host $buildhostname"
         ssl_admin=$"$ssl_admin_pre$domain"
-		sudo certbot certonly --dns-cloudflare --dns-cloudflare-credentials /home/$username/cfcred/cf-api-token.ini -d $fullhn -m $ssl_admin --agree-tos
+		sudo certbot certonly --dns-cloudflare --dns-cloudflare-credentials /home/$username/cfcred/cf-api-token.ini -d $fullhn -m $ssl_admin --agree-tos -n
         if [ -f /etc/letsencrypt/live/$fullhn/fullchain.pem ]
         then
             echo "Copying certs for docker"

@@ -1,5 +1,6 @@
 #!/bin/bash
 
+# Create Base DIR
 mkdir -p /opt/osbuild
 cd /opt/osbuild
 ## 

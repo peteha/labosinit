@@ -1,7 +1,7 @@
 #!/bin/bash
 
-mkdir -p ~/osbuild
-cd ~/osbuild
+mkdir -p /home/$username/osbuild
+cd /home/$username/osbuild
 ## 
 curl -fs https://raw.githubusercontent.com/peteha/labosinit/main/osinit.sh --output osinit.sh
 chmod +x osinit.sh

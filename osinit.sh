@@ -31,6 +31,7 @@ else
     newuser=True
 fi
 echo
+chown -R $username:$username /home/$username
 
 if [ ! -z ${newuser} ]
 	then

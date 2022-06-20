@@ -15,6 +15,7 @@ if [ ! -f hostbuild.env ]; then
 fi
 
 source hostbuild.env
+source /etc/lsb-release
 
 cur_tz=`cat /etc/timezone`
 fullhn="$buildhostname.$domain"
@@ -160,5 +161,10 @@ then
 		sudo apt install $inst_pkgs -y
         if [[ $raspi == "True" ]]
         then
-            sudo apt install $raspi_pkgs -y
+            if [[ $DISTRIB_RELEASE == 22.04 ]]
+            then
+                echo "Ubuntu Version -- $DISTRIB_RELEASE"
+                sudo apt install $raspi_pkgs -y
+            fi
+        fi
 fi

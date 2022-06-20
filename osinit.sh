@@ -33,6 +33,7 @@ else
 fi
 echo
 chown -R $username:$username /home/$username
+chown -R $username:$username /opt/osbuild
 
 if [ ! -z ${newuser} ]
 	then
@@ -157,4 +158,7 @@ then
 		sudo apt upgrade -y
 		# Install Base Packages
 		sudo apt install $inst_pkgs -y
+        if [[ $raspi == "True" ]]
+        then
+            sudo apt install $raspi_pkgs -y
 fi

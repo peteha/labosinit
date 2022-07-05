@@ -156,7 +156,7 @@ fi
 if [[ $update == "True" ]]
 then
 		sudo apt update
-		sudo apt upgrade -y
+		sudo apt upgrade -y --force-yes
 		# Install Base Packages
 		sudo apt install $inst_pkgs -y
         if [[ $raspi == "True" ]]

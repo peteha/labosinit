@@ -75,24 +75,26 @@ echo
 echo
 echo "Username will be:             $username"
 ## Hostname Setup
-if [[ "$buildhostname" != "$HOSTNAME" ]]
-    then
-        echo "## Setting Hostname $buildhostname ##"
-	    sudo hostnamectl set-hostname $buildhostname
-    else
-        buildhostname=$"$HOSTNAME"
-    fi
-echo "Hostname will be:             $buildhostname"
-sed -i.bak "/buildhostname=/c\buildhostname=$buildhostname" hostbuild.env && rm hostbuild.env.bak
+if [[ "$dietpi" == "True" ]]
+    if [[ "$buildhostname" != "$HOSTNAME" ]]
+        then
+            echo "## Setting Hostname $buildhostname ##"
+	        sudo hostnamectl set-hostname $buildhostname
+        else
+            buildhostname=$"$HOSTNAME"
+        fi
+    echo "Hostname will be:             $buildhostname"
+    sed -i.bak "/buildhostname=/c\buildhostname=$buildhostname" hostbuild.env && rm hostbuild.env.bak
 
-if [[ "$cur_tz" != "$tz" ]]
-    then
-        echo "## Setting Timezone $tz ##"
-	    sudo timedatectl set-timezone $tz
-    else
-        tz=$"$cur_tz"
-    fi
-echo "Timezone will be:             $tz"
+    if [[ "$cur_tz" != "$tz" ]]
+        then
+            echo "## Setting Timezone $tz ##"
+	        sudo timedatectl set-timezone $tz
+        else
+            tz=$"$cur_tz"
+        fi
+    echo "Timezone will be:             $tz"
+fi
 
 if [[ $createcert == "True" ]]
 then

@@ -75,7 +75,7 @@ echo
 echo
 echo "Username will be:             $username"
 ## Hostname Setup
-if [[ "$dietpi" == "True" ]]
+if [[ "$dietpi" == "False" ]]
     if [[ "$buildhostname" != "$HOSTNAME" ]]
         then
             echo "## Setting Hostname $buildhostname ##"
@@ -92,7 +92,7 @@ if [[ "$dietpi" == "True" ]]
 	        sudo timedatectl set-timezone $tz
         else
             tz=$"$cur_tz"
-        fi
+    fi
     echo "Timezone will be:             $tz"
 fi
 
@@ -121,7 +121,7 @@ then
             bash -c "cat /etc/letsencrypt/live/$fullhn/privkey.pem >$certdir/$fullhn-privkey.key"
             chown -R $username:$username $certdir
         fi
-	fi
+    fi
 fi
 # Install Cockpit #
 if [[ $inst_cockpit == "True" ]]

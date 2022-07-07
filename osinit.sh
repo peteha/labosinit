@@ -76,13 +76,14 @@ echo
 echo "Username will be:             $username"
 ## Hostname Setup
 if [[ "$dietpi" == "False" ]]
+then
     if [[ "$buildhostname" != "$HOSTNAME" ]]
         then
             echo "## Setting Hostname $buildhostname ##"
 	        sudo hostnamectl set-hostname $buildhostname
         else
             buildhostname=$"$HOSTNAME"
-        fi
+    fi
     echo "Hostname will be:             $buildhostname"
     sed -i.bak "/buildhostname=/c\buildhostname=$buildhostname" hostbuild.env && rm hostbuild.env.bak
 

@@ -97,6 +97,20 @@ then
     echo "Timezone will be:             $tz"
 fi
 
+if [[ "$k8boot" == "True" ]]
+    then
+        if [ -f "$bootfile" ]; then
+            if grep -q "$k8_params" $bootfile; then
+                echo "## Params for K8 already in $bootfile"
+            else
+                printf %s "$k8_params" >> $bootfile
+                echo "## Params for K8 added to $bootfile"
+            fi
+        else
+            echo "## Bootfile not found - $bootfile ##"
+        fi
+fi
+
 if [[ $createcert == "True" ]]
 then
     if [ ! -f /home/$username/cfcred/cf-api-token.ini ]
@@ -170,4 +184,9 @@ then
                 sudo apt install $raspi_pkgs -y
             fi
         fi
+fi
+
+if [[ $reboot == "True" ]]
+then
+    reboot
 fi

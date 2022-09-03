@@ -1,5 +1,5 @@
 #!/bin/bash
-if [ ! -f /opt/certs/certlist ]
+if [ -f /opt/certs/certlist ]
 then
     if [ ! -f ~/cfcred/cf-api-token.ini ]
     then

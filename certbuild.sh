@@ -1,9 +1,10 @@
 #!/bin/bash
+certdir="/opt/certs"
 if [ -f /opt/certs/certlist ]
 then
     if [ ! -f ~/cfcred/cf-api-token.ini ]
     then
-        echo -n "Enter CloudFlare API Token: "
+        echo -n "Enter CloudFlare API Token: "lsb
         read cfapitoken
         mkdir -p ~/cfcred
 		echo dns_cloudflare_api_token = "$cfapitoken" > ~/cfcred/cf-api-token.ini
@@ -13,7 +14,7 @@ then
     certlines=$(cat $certs)
     for line in $certlines
     do
-		echo "## Creating Key for Host $line"
+		echo "## Creating Key for Host $line ##"
         ssl_admin="admin@pggb.net"
 		sudo certbot certonly --dns-cloudflare --dns-cloudflare-credentials ~/cfcred/cf-api-token.ini -d $line -m $ssl_admin --agree-tos -n
         if [ -f /etc/letsencrypt/live/$line/fullchain.pem ]

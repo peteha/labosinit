@@ -19,7 +19,7 @@ then
 		sudo certbot certonly --dns-cloudflare --dns-cloudflare-credentials /home/peteha/cfcred/cf-api-token.ini -d $line -m $ssl_admin --agree-tos -n
         if [ -f /etc/letsencrypt/live/$line/fullchain.pem ]
         then
-            echo "Copying certs for docker"
+            echo "Copying certs for $line"
             mkdir -p $certdir
             bash -c "cat /etc/letsencrypt/live/$line/fullchain.pem /etc/letsencrypt/live/$line/privkey.pem >$certdir/$line.cert"
             bash -c "cat /etc/letsencrypt/live/$line/fullchain.pem >$certdir/$line-fullchain.cert"

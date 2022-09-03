@@ -4,7 +4,7 @@ if [ -f /opt/certs/certlist ]
 then
     if [ ! -f ~/cfcred/cf-api-token.ini ]
     then
-        echo -n "Enter CloudFlare API Token: "lsb
+        echo -n "Enter CloudFlare API Token: "
         read cfapitoken
         mkdir -p ~/cfcred
 		echo dns_cloudflare_api_token = "$cfapitoken" > ~/cfcred/cf-api-token.ini

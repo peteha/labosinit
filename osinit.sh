@@ -178,9 +178,9 @@ then
 		sudo apt install $inst_pkgs -y
         if [[ $raspi == "True" ]]
         then
-            if [[ $DISTRIB_RELEASE == 22.04 ]]
+            if [[ $(lsb_release -rs) == "22.04" ]]
             then
-                echo "Ubuntu Version -- $DISTRIB_RELEASE"
+                echo "Ubuntu Version -- $(lsb_release -rs)"
                 sudo apt install $raspi_pkgs -y
             fi
         fi

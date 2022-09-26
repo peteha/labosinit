@@ -32,9 +32,6 @@ else
     read -s passwd
     newuser=True
 fi
-echo
-chown -R $username:$username /home/$username
-chown -R $username:$username /opt/osbuild
 
 if [ ! -z ${newuser} ]
 	then
@@ -55,6 +52,7 @@ if [[ "$sudoers" == "True" ]]
 fi
 if [[ "$gitpk" == "True" ]]
     then
+        echo "## Getting SSH Keys ##"
 		gitpk_dl=`curl -s https://github.com/$username.keys`
         if [[ $gitpk_dl != "Not Found" ]]
         then

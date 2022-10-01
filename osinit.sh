@@ -183,6 +183,20 @@ if [[ $inst_docker == "True" ]]; then
     fi
 fi
 
+# Install NTP #
+if [[ $inst_ntp == "True" ]]; then
+    if [[ $(which sntp) ]]; then
+        echo "## NTP Installed ##"
+    else
+        sudo apt install ntp -y
+        sed '/^pool /d' /etc/ntp.conf
+        echo "pool $ntpserver iburst" >> /etc/ntp.conf
+    fi
+    echo
+    echo "## NTP Installed and using $ntpserver ##"
+fi
+
+
 if [[ $update == "True" ]]; then
     echo
     echo "## Updating environment and installing packages ##"

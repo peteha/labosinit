@@ -16,6 +16,7 @@ if [ ! -f hostbuild.env ]; then
     sudo apt install nano
     nano hostbuild.env
 fi
+
 echo "## Using hostbuild.env ##"
 source hostbuild.env
 source /etc/lsb-release
@@ -24,6 +25,11 @@ cur_tz=`cat /etc/timezone`
 fullhn="$buildhostname.$domain"
 
 echo "## Building For $fullhn ##"
+
+if [ $buildhostname = "" ]; then
+    echo "## No hostname set - check hostbuild.env ##"
+    exit
+fi
 
 echo "## Setting Up Environment ##"
 echo
@@ -124,15 +130,19 @@ then
 		echo dns_cloudflare_api_token = "$cfapitoken" > /home/$username/cfcred/cf-api-token.ini
 		chmod 600 /home/$username/cfcred/cf-api-token.ini
     fi
-    sudo apt install certbot python3-certbot-dns-cloudflare python3-pip -y
+    if ! command -v certbot &> /dev/null; then
+        sudo apt install certbot python3-certbot-dns-cloudflare python3-pip -y
+    fi
+    echo
+    echo "## Certbot and modules installed ##"
 	if [ ! -z ${buildhostname} ]
 	then
-		echo "## Creating Key for Host $buildhostname"
+		echo "## Creating Key for Host $buildhostname ##"
         ssl_admin=$"$ssl_admin_pre$domain"
 		sudo certbot certonly --dns-cloudflare --dns-cloudflare-credentials /home/$username/cfcred/cf-api-token.ini -d $fullhn -m $ssl_admin --agree-tos -n
         if [ -f /etc/letsencrypt/live/$fullhn/fullchain.pem ]
         then
-            echo "Copying certs for docker"
+            echo "Copying certs for $fullhn"
             mkdir -p $certdir
             bash -c "cat /etc/letsencrypt/live/$fullhn/fullchain.pem /etc/letsencrypt/live/$fullhn/privkey.pem >$certdir/$fullhn.cert"
             bash -c "cat /etc/letsencrypt/live/$fullhn/fullchain.pem >$certdir/$fullhn-fullchain.cert"
@@ -142,51 +152,50 @@ then
     fi
 fi
 # Install Cockpit #
-if [[ $inst_cockpit == "True" ]]
-then
-    sudo apt install cockpit -y
-    if [ -f /etc/letsencrypt/live/$fullhn/fullchain.pem ]
-    then
-        echo "Copying certs for Cockpit"
-        bash -c "cat /etc/letsencrypt/live/$fullhn/fullchain.pem /etc/letsencrypt/live/$fullhn/privkey.pem >/etc/cockpit/ws-certs.d/$fullhn.cert"
-        sudo systemctl stop cockpit.service
-        sudo systemctl start cockpit.service
+cockpitstatus='systemctl is-active cockpit.socket'
+if [[ $inst_cockpit == "True" ]]; then
+    if [[ $cockpitstatus = "inactive" ]]; then
+        sudo apt install cockpit -y
+        if [ -f /etc/letsencrypt/live/$fullhn/fullchain.pem ]; then
+            echo "Copying certs for Cockpit"
+            bash -c "cat /etc/letsencrypt/live/$fullhn/fullchain.pem /etc/letsencrypt/live/$fullhn/privkey.pem >/etc/cockpit/ws-certs.d/$fullhn.cert"
+            sudo systemctl stop cockpit.service
+            sudo systemctl start cockpit.service
+        fi
     fi
+    echo
+    echo "## Cockpit is installed and running ##"
 fi
 
 # Install Docker
-
-if [[ $inst_docker == "True" ]]
-    then
-        if [[ $(which docker) && $(docker --version) ]]
-        then
-            echo "Docker installed"
-        else
-            echo "## Installing Docker ##"
-            curl -sSL https://get.docker.com | sh
-            groupadd docker
-            usermod -aG docker $username
-        fi
-    if [[ $inst_dockercompose == "True" ]]
-    then
+dockerstatus='systemctl is-active docker.socket'
+if [[ $inst_docker == "True" ]]; then
+    if [[ $(which docker) && $(docker --version) ]]; then
+        echo "## Docker installed ##"
+    else
+        echo "## Installing Docker ##"
+        curl -sSL https://get.docker.com | sh
+        groupadd docker
+        usermod -aG docker $username
+    fi
+    if [[ $inst_dockercompose == "True" ]]; then
         pip3 install docker-compose
     fi
 fi
 
-if [[ $update == "True" ]]
-then
-		sudo apt update
-		sudo apt upgrade -y
-		# Install Base Packages
-		sudo apt install $inst_pkgs -y
-        if [[ $raspi == "True" ]]
-        then
-            if [[ $(lsb_release -rs) == "22.04" ]]
-            then
-                echo "Ubuntu Version -- $(lsb_release -rs)"
-                sudo apt install $raspi_pkgs -y
-            fi
+if [[ $update == "True" ]]; then
+    echo
+    echo "## Updating environment and installing packages ##"
+	sudo apt update
+	sudo apt upgrade -y
+	# Install Base Packages
+	sudo apt install $inst_pkgs -y
+    if [[ $raspi == "True" ]]; then
+        if [[ $(lsb_release -rs) == "22.04" ]]; then
+            echo "Ubuntu Version -- $(lsb_release -cs)"
+            sudo apt install $raspi_pkgs -y
         fi
+    fi
 fi
 
 if [[ $reboot == "True" ]]

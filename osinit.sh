@@ -19,14 +19,13 @@ fi
 
 echo "## Using hostbuild.env ##"
 source hostbuild.env
-source /etc/lsb-release
 
 cur_tz=`cat /etc/timezone`
 fullhn="$buildhostname.$domain"
 
 echo "## Building For $fullhn ##"
 
-if [ $buildhostname = "" ]; then
+if [[ $buildhostname == "" ]]; then
     echo "## No hostname set - check hostbuild.env ##"
     exit
 fi
@@ -152,9 +151,9 @@ then
     fi
 fi
 # Install Cockpit #
-cockpitstatus='systemctl is-active cockpit.socket'
+cockpitstatus=$(systemctl is-active cockpit.socket)
 if [[ $inst_cockpit == "True" ]]; then
-    if [[ $cockpitstatus = "inactive" ]]; then
+    if [[ ! $cockpitstatus == "active" ]]; then
         sudo apt install cockpit -y
         if [ -f /etc/letsencrypt/live/$fullhn/fullchain.pem ]; then
             echo "Copying certs for Cockpit"
@@ -168,7 +167,6 @@ if [[ $inst_cockpit == "True" ]]; then
 fi
 
 # Install Docker
-dockerstatus='systemctl is-active docker.socket'
 if [[ $inst_docker == "True" ]]; then
     if [[ $(which docker) && $(docker --version) ]]; then
         echo "## Docker installed ##"
@@ -184,14 +182,14 @@ if [[ $inst_docker == "True" ]]; then
 fi
 
 # Install NTP #
+ntpstatus=$(systemctl is-active ntp)
 if [[ $inst_ntp == "True" ]]; then
-    if [[ $(which sntp) ]]; then
-        echo "## NTP Installed ##"
-    else
+    if [[ ! $ntpstatus == "active" ]]; then
         sudo apt install ntp -y
-        sed '/^pool /d' /etc/ntp.conf
-        echo "pool $ntpserver iburst" >> /etc/ntp.conf
     fi
+    sed -i '/^pool /d' /etc/ntp.conf
+    echo "pool $ntpserver" >> /etc/ntp.conf
+    systemctl restart ntp
     echo
     echo "## NTP Installed and using $ntpserver ##"
 fi

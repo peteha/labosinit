@@ -61,15 +61,15 @@ if [[ "$sudoers" == "True" ]]
 fi
 
 if [[ $saltminion == "True" ]]; then
-    inst_pkgs = "$inst_pkgs salt-minion"
+    $inst_pkgs = "$inst_pkgs salt-minion"
 fi
 
 if [[ $inst_cockpit == "True" ]]; then
-    inst_pkgs = "$inst_pkgs cockpit"
+    $inst_pkgs = "$inst_pkgs cockpit"
 fi
 
 if [[ $inst_ntp == "True" ]]; then
-    inst_pkgs = "$inst_pkgs ntp"
+    $inst_pkgs = "$inst_pkgs ntp"
 fi
 
 if [[ $raspi == "True" ]]; then

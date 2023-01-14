@@ -77,7 +77,6 @@ if [[ $raspi == "True" ]]; then
         if [[ $dietpi == "True" ]]; then
             sudo apt install $inst_pkgs -y
         fi
-        sudo apt install $inst_pkgs $raspi_pkgs -y
 else
     echo $inst_pkgs
     echo "## Updating APT ##"

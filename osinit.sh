@@ -60,7 +60,7 @@ if [[ "$sudoers" == "True" ]]
                 sudo echo "$username ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
         fi
 fi
-
+sudo apt update
 sudo apt install $inst_pkgs -y
 
 if [[ $raspi == "True" ]]; then

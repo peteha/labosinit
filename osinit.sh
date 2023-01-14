@@ -59,7 +59,7 @@ if [[ "$sudoers" == "True" ]]
                 sudo echo "$username ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
         fi
 fi
-
+echo $inst_pkgs
 if [[ $saltminion == "True" ]]; then
     inst_pkgs=$inst_pkgs" salt-minion"
 fi
@@ -76,7 +76,7 @@ if [[ $raspi == "True" ]]; then
         sudo apt update
         sudo apt install $inst_pkgs $raspi_pkgs -y
 fi
-
+echo $inst_pkgs
 sudo apt update
 sudo apt install $inst_pkgs $raspi_pkgs -y
 

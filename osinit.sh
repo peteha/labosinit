@@ -142,7 +142,8 @@ then
 		chmod 600 /home/$username/cfcred/cf-api-token.ini
     fi
     if ! command -v certbot &> /dev/null; then
-        sudo apt install certbot python3-certbot-dns-cloudflare python3-pip -y
+        echo "## No certbot installed ##"
+        exit
     fi
     echo
     echo "## Certbot and modules installed ##"

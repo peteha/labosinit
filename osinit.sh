@@ -64,9 +64,9 @@ if [[ $saltminion == "True" ]]; then
     if [[ $(lsb_release -rs) == "22.04" ]]; then
         echo "Ubuntu Version -- $(lsb_release -cs)"
         echo "## Adding salt-minion to pkgs ##"
-        $inst_pkgs = "$inst_pkgs salt-minion"
+        inst_pkgs = "$inst_pkgs salt-minion"
     fi
-    $inst_pkgs = "$inst_pkgs salt-minion"
+    inst_pkgs = "$inst_pkgs salt-minion"
 fi
 
 if [[ $inst_cockpit == "True" ]]; then
@@ -75,16 +75,16 @@ if [[ $inst_cockpit == "True" ]]; then
         echo "## Adding Cockpit to pkgs ##"
         $inst_pkgs = "$inst_pkgs cockpit"
     fi
-    $inst_pkgs = "$inst_pkgs cockpit"
+    inst_pkgs = "$inst_pkgs cockpit"
 fi
 
 if [[ $inst_ntp == "True" ]]; then
     if [[ $(lsb_release -rs) == "22.04" ]]; then
         echo "Ubuntu Version -- $(lsb_release -cs)"
         echo "## Adding NTP to pkgs ##"
-        $inst_pkgs = "$inst_pkgs ntp"
+        inst_pkgs = "$inst_pkgs ntp"
     fi
-    $inst_pkgs = "$inst_pkgs ntp"
+    inst_pkgs = "$inst_pkgs ntp"
 fi
 
 if [[ $raspi == "True" ]]; then

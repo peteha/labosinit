@@ -61,38 +61,19 @@ if [[ "$sudoers" == "True" ]]
 fi
 
 if [[ $saltminion == "True" ]]; then
-    if [[ $(lsb_release -rs) == "22.04" ]]; then
-        echo "Ubuntu Version -- $(lsb_release -cs)"
-        echo "## Adding salt-minion to pkgs ##"
-        inst_pkgs = "$inst_pkgs salt-minion"
-    fi
     inst_pkgs = "$inst_pkgs salt-minion"
 fi
 
 if [[ $inst_cockpit == "True" ]]; then
-    if [[ $(lsb_release -rs) == "22.04" ]]; then
-        echo "Ubuntu Version -- $(lsb_release -cs)"
-        echo "## Adding Cockpit to pkgs ##"
-        $inst_pkgs = "$inst_pkgs cockpit"
     fi
     inst_pkgs = "$inst_pkgs cockpit"
 fi
 
 if [[ $inst_ntp == "True" ]]; then
-    if [[ $(lsb_release -rs) == "22.04" ]]; then
-        echo "Ubuntu Version -- $(lsb_release -cs)"
-        echo "## Adding NTP to pkgs ##"
-        inst_pkgs = "$inst_pkgs ntp"
-    fi
     inst_pkgs = "$inst_pkgs ntp"
 fi
 
 if [[ $raspi == "True" ]]; then
-    if [[ $(lsb_release -rs) == "22.04" ]]; then
-        echo "Ubuntu Version -- $(lsb_release -cs)"
-        echo "## Removing interactive update parameters ##"
-        sudo sed -i "/#\$nrconf{restart} = 'i';/s/.*/\$nrconf{restart} = 'a';/" /etc/needrestart/needrestart.conf
-        sudo sed -i "s/#\$nrconf{kernelhints} = -1;/\$nrconf{kernelhints} = -1;/g" /etc/needrestart/needrestart.conf
         sudo apt update
         sudo apt install $inst_pkgs $raspi_pkgs -y
     fi

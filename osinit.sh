@@ -65,7 +65,6 @@ if [[ $saltminion == "True" ]]; then
 fi
 
 if [[ $inst_cockpit == "True" ]]; then
-    fi
     inst_pkgs = "$inst_pkgs cockpit"
 fi
 

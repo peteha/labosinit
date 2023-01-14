@@ -65,7 +65,7 @@ fi
 if [[ $raspi == "True" ]]; then
     if [[ $(lsb_release -rs) == "22.04" ]]; then
         echo "Ubuntu Version -- $(lsb_release -cs)"
-        sudo sed "/#\$nrconf{restart} = 'i';/s/.*/\$nrconf{restart} = 'a';/" /etc/needrestart/needrestart.conf
+        sudo sed -i "/#\$nrconf{restart} = 'i';/s/.*/\$nrconf{restart} = 'a';/" /etc/needrestart/needrestart.conf
         sudo apt update
         sudo apt install $inst_pkgs -y
         sudo apt install $raspi_pkgs -y

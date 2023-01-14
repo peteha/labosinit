@@ -66,6 +66,7 @@ if [[ $saltminion == "True" ]]; then
         echo "## Adding salt-minion to pkgs ##"
         $inst_pkgs = "$inst_pkgs salt-minion"
     fi
+    $inst_pkgs = "$inst_pkgs salt-minion"
 fi
 
 if [[ $inst_cockpit == "True" ]]; then
@@ -74,6 +75,7 @@ if [[ $inst_cockpit == "True" ]]; then
         echo "## Adding Cockpit to pkgs ##"
         $inst_pkgs = "$inst_pkgs cockpit"
     fi
+    $inst_pkgs = "$inst_pkgs cockpit"
 fi
 
 if [[ $inst_ntp == "True" ]]; then
@@ -82,14 +84,7 @@ if [[ $inst_ntp == "True" ]]; then
         echo "## Adding NTP to pkgs ##"
         $inst_pkgs = "$inst_pkgs ntp"
     fi
-fi
-
-if [[ $inst_cockpit == "True" ]]; then
-    if [[ $(lsb_release -rs) == "22.04" ]]; then
-        echo "Ubuntu Version -- $(lsb_release -cs)"
-        echo "## Adding Cockpit to pkgs ##"
-        $inst_pkgs = "$inst_pkgs cockpit"
-    fi
+    $inst_pkgs = "$inst_pkgs ntp"
 fi
 
 if [[ $raspi == "True" ]]; then
@@ -101,6 +96,8 @@ if [[ $raspi == "True" ]]; then
         sudo apt update
         sudo apt install $inst_pkgs $raspi_pkgs -y
     fi
+    sudo apt update
+    sudo apt install $inst_pkgs $raspi_pkgs -y
 fi
 
 if [[ "$gitpk" == "True" ]]

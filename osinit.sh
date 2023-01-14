@@ -198,9 +198,6 @@ fi
 # Install NTP #
 ntpstatus=$(systemctl is-active ntp)
 if [[ $inst_ntp == "True" ]]; then
-    if [[ ! $ntpstatus == "active" ]]; then
-        sudo apt install ntp -y
-    fi
     sed -i '/^pool /d' /etc/ntp.conf
     echo "pool $ntpserver" >> /etc/ntp.conf
     systemctl restart ntp

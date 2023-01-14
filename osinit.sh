@@ -60,6 +60,19 @@ if [[ "$sudoers" == "True" ]]
                 sudo echo "$username ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
         fi
 fi
+
+sudo apt install $inst_pkgs -y
+
+if [[ "$raspi" == "True" ]]
+	sudo apt install $inst_pkgs -y
+    if [[ $raspi == "True" ]]; then
+        if [[ $(lsb_release -rs) == "22.10" ]]; then
+            echo "Ubuntu Version -- $(lsb_release -cs)"
+            sudo apt install $raspi_pkgs -y
+        fi
+    fi
+fi
+
 if [[ "$gitpk" == "True" ]]
     then
         echo "## Getting SSH Keys ##"
@@ -203,7 +216,7 @@ if [[ $update == "True" ]]; then
 	# Install Base Packages
 	sudo apt install $inst_pkgs -y
     if [[ $raspi == "True" ]]; then
-        if [[ $(lsb_release -rs) == "22.04" ]]; then
+        if [[ $(lsb_release -rs) == "22.10" ]]; then
             echo "Ubuntu Version -- $(lsb_release -cs)"
             sudo apt install $raspi_pkgs -y
         fi

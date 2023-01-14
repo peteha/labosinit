@@ -74,7 +74,10 @@ fi
 
 if [[ $raspi == "True" ]]; then
         sudo apt update
-        sudo apt install $inst_pkgs $raspi_pkgs -y
+        if [[ $dietpi == "True" ]]; then
+            sudo apt install $inst_pkgs $raspi_pkgs -y
+        fi
+        sudo apt install $inst_pkgs -y
 fi
 
 echo $inst_pkgs

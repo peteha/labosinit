@@ -76,8 +76,12 @@ if [[ $raspi == "True" ]]; then
         sudo apt update
         sudo apt install $inst_pkgs $raspi_pkgs -y
 fi
+
 echo $inst_pkgs
+echo "## Updating APT ##"
 sudo apt update
+echo "## Installing $inst_pkgs $raspi_pkgs"
+
 sudo apt install $inst_pkgs $raspi_pkgs -y
 
 if [[ "$gitpk" == "True" ]]

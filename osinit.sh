@@ -60,6 +60,37 @@ if [[ "$sudoers" == "True" ]]
         fi
 fi
 
+if [[ $saltminion == "True" ]]; then
+    if [[ $(lsb_release -rs) == "22.04" ]]; then
+        echo "Ubuntu Version -- $(lsb_release -cs)"
+        echo "## Adding salt-minion to pkgs ##"
+        $inst_pkgs = "$inst_pkgs salt-minion"
+    fi
+fi
+
+if [[ $inst_cockpit == "True" ]]; then
+    if [[ $(lsb_release -rs) == "22.04" ]]; then
+        echo "Ubuntu Version -- $(lsb_release -cs)"
+        echo "## Adding Cockpit to pkgs ##"
+        $inst_pkgs = "$inst_pkgs cockpit"
+    fi
+fi
+
+if [[ $inst_ntp == "True" ]]; then
+    if [[ $(lsb_release -rs) == "22.04" ]]; then
+        echo "Ubuntu Version -- $(lsb_release -cs)"
+        echo "## Adding NTP to pkgs ##"
+        $inst_pkgs = "$inst_pkgs ntp"
+    fi
+fi
+
+if [[ $inst_cockpit == "True" ]]; then
+    if [[ $(lsb_release -rs) == "22.04" ]]; then
+        echo "Ubuntu Version -- $(lsb_release -cs)"
+        echo "## Adding Cockpit to pkgs ##"
+        $inst_pkgs = "$inst_pkgs cockpit"
+    fi
+fi
 
 if [[ $raspi == "True" ]]; then
     if [[ $(lsb_release -rs) == "22.04" ]]; then

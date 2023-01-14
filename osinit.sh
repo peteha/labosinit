@@ -70,6 +70,8 @@ if [[ $raspi == "True" ]]; then
     fi
 fi
 
+exit
+
 if [[ "$gitpk" == "True" ]]
     then
         echo "## Getting SSH Keys ##"

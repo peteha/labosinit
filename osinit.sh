@@ -67,6 +67,7 @@ if [[ $raspi == "True" ]]; then
         echo "Ubuntu Version -- $(lsb_release -cs)"
         echo "## Removing interactive update parameters ##"
         sudo sed -i "/#\$nrconf{restart} = 'i';/s/.*/\$nrconf{restart} = 'a';/" /etc/needrestart/needrestart.conf
+        sudo sed -i "s/#\$nrconf{kernelhints} = -1;/\$nrconf{kernelhints} = -1;/g" /etc/needrestart/needrestart.conf
         sudo apt update
         sudo apt install $inst_pkgs -y
         sudo apt install $raspi_pkgs -y

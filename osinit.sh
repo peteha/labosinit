@@ -63,13 +63,10 @@ fi
 
 sudo apt install $inst_pkgs -y
 
-if [[ "$raspi" == "True" ]]
-	sudo apt install $inst_pkgs -y
-    if [[ $raspi == "True" ]]; then
-        if [[ $(lsb_release -rs) == "22.10" ]]; then
-            echo "Ubuntu Version -- $(lsb_release -cs)"
-            sudo apt install $raspi_pkgs -y
-        fi
+if [[ $raspi == "True" ]]; then
+    if [[ $(lsb_release -rs) == "22.10" ]]; then
+        echo "Ubuntu Version -- $(lsb_release -cs)"
+        sudo apt install $raspi_pkgs -y
     fi
 fi
 

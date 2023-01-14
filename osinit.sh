@@ -68,8 +68,7 @@ if [[ $raspi == "True" ]]; then
         sudo sed -i "/#\$nrconf{restart} = 'i';/s/.*/\$nrconf{restart} = 'a';/" /etc/needrestart/needrestart.conf
         sudo sed -i "s/#\$nrconf{kernelhints} = -1;/\$nrconf{kernelhints} = -1;/g" /etc/needrestart/needrestart.conf
         sudo apt update
-        sudo apt install $inst_pkgs -y
-        sudo apt install $raspi_pkgs -y
+        sudo apt install $inst_pkgs $raspi_pkgs -y
     fi
 fi
 
@@ -166,14 +165,11 @@ fi
 # Install Cockpit #
 cockpitstatus=$(systemctl is-active cockpit.socket)
 if [[ $inst_cockpit == "True" ]]; then
-    if [[ ! $cockpitstatus == "active" ]]; then
-        sudo apt install cockpit -y
-        if [ -f /etc/letsencrypt/live/$fullhn/fullchain.pem ]; then
+    if [ -f /etc/letsencrypt/live/$fullhn/fullchain.pem ]; then
             echo "Copying certs for Cockpit"
-            bash -c "cat /etc/letsencrypt/live/$fullhn/fullchain.pem /etc/letsencrypt/live/$fullhn/privkey.pem >/etc/cockpit/ws-certs.d/$fullhn.cert"
+            sudo bash -c "cat /etc/letsencrypt/live/$fullhn/fullchain.pem /etc/letsencrypt/live/$fullhn/privkey.pem >/etc/cockpit/ws-certs.d/$fullhn.cert"
             sudo systemctl stop cockpit.service
             sudo systemctl start cockpit.service
-        fi
     fi
     echo
     echo "## Cockpit is installed and running ##"
@@ -210,14 +206,6 @@ if [[ $update == "True" ]]; then
     echo "## Updating environment and installing packages ##"
 	sudo apt update
 	sudo apt upgrade -y
-	# Install Base Packages
-	sudo apt install $inst_pkgs -y
-    if [[ $raspi == "True" ]]; then
-        if [[ $(lsb_release -rs) == "22.10" ]]; then
-            echo "Ubuntu Version -- $(lsb_release -cs)"
-            sudo apt install $raspi_pkgs -y
-        fi
-    fi
 fi
 
 if [[ $reboot == "True" ]]

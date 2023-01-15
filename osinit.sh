@@ -2,7 +2,7 @@
 echo "## Setting Up OS Build Directory ##"
 # Create Base DIR
 mkdir -p /opt/osbuild
-cd /opt/o
+cd /opt/osbuild
 ##
 ##
 echo "## Installing Scripts ##"

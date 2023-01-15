@@ -44,6 +44,7 @@ else
     newuser=True
 fi
 
+
 if [ ! -z ${newuser} ]
 	then
 	    echo "## Adding User '$username' ##"

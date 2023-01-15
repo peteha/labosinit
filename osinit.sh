@@ -48,6 +48,7 @@ if [ ! -z ${newuser} ]
 		useradd $username --create-home --shell /bin/bash --groups sudo
 		echo "$username:$passwd" | sudo chpasswd
 fi
+
 if [[ "$sudoers" == "True" ]]
     then
 		# Set no sudo passwd
@@ -59,7 +60,7 @@ if [[ "$sudoers" == "True" ]]
                 sudo echo "$username ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
         fi
 fi
-echo $inst_pkgs
+
 if [[ $saltminion == "True" ]]; then
     inst_pkgs=$inst_pkgs" salt-minion"
 fi

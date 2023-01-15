@@ -58,6 +58,7 @@ if [[ "$sudoers" == "True" ]]
         if sudo grep -Fxq "$username ALL=(ALL) NOPASSWD: ALL" /etc/sudoers
             then
                 echo "## Already SUDO ##"
+                ##
             else
                 echo "Set SUDO Happening for $username"
                 sudo echo "$username ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers

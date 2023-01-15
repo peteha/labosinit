@@ -9,7 +9,7 @@ curl -fs https://raw.githubusercontent.com/peteha/labosinit/main/osinit.sh --out
 chmod +x osinit.sh
 curl -fs https://raw.githubusercontent.com/peteha/labosinit/main/certbuild.sh --output certbuild.sh
 chmod +x certbuild.sh
-
+exit
 ## 
 if [ ! -f hostbuild.env ]; then
     echo "## No hostbuild.env file available ##"

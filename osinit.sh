@@ -5,11 +5,12 @@ mkdir -p /opt/osbuild
 cd /opt/osbuild
 ##
 echo "## Installing Scripts ##"
+exit
 curl -fs https://raw.githubusercontent.com/peteha/labosinit/main/osinit.sh --output osinit.sh
 chmod +x osinit.sh
 curl -fs https://raw.githubusercontent.com/peteha/labosinit/main/certbuild.sh --output certbuild.sh
 chmod +x certbuild.sh
-exit
+
 ## 
 if [ ! -f hostbuild.env ]; then
     echo "## No hostbuild.env file available ##"

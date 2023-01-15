@@ -2,7 +2,8 @@
 echo "## Setting Up OS Build Directory ##"
 # Create Base DIR
 mkdir -p /opt/osbuild
-cd /opt/osbuild
+cd /opt/o
+##
 ##
 echo "## Installing Scripts ##"
 curl -fs https://raw.githubusercontent.com/peteha/labosinit/main/osinit.sh --output osinit.sh

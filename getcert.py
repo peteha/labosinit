@@ -1,12 +1,9 @@
 import certbot.main
 import os
 
-
 emailadd = "admin@pggb.net"
 fullhostname = "pi3.pggb.net"
 cfcredir = "/root/cfcred/cf-api-token.ini"
-
-
 
 if os.path.exists(_cfcredir, _addr, _fhn):
     certbot.main.main([
@@ -20,4 +17,3 @@ if os.path.exists(_cfcredir, _addr, _fhn):
         "--preferred-challenges", "dns-01"
     ])
 else:
-

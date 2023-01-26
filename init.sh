@@ -10,6 +10,7 @@ curl -fs https://raw.githubusercontent.com/peteha/labosinit/main/osinit.sh --out
 chmod +x osinit.sh
 curl -fs https://raw.githubusercontent.com/peteha/labosinit/main/certbuild.sh --output certbuild.sh
 chmod +x certbuild.sh
+
 ## 
 if [ ! -f hostbuild.env ]; then
     echo "## No hostbuild.env file available ##"
@@ -20,7 +21,6 @@ fi
 echo "## Using hostbuild.env ##"
 source hostbuild.env
 
-echo "## Setting variable ##"
 cur_tz=`cat /etc/timezone`
 fullhn="$buildhostname.$domain"
 
@@ -82,7 +82,6 @@ if [[ $raspi == "True" ]]; then
         if [[ $dietpi == "True" ]]; then
             sudo apt install $inst_pkgs -y
         fi
-fi
 
 if [[ "$gitpk" == "True" ]]
     then

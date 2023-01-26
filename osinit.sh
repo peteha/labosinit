@@ -157,8 +157,6 @@ then
         print "## No certbot installed ##"
         exit
     fi
-    print
-    print "## Certbot and modules installed ##"
 	if [ ! -z ${buildhostname} ]
 	then
 		print "## Creating Key for Host $buildhostname ##"
@@ -166,7 +164,7 @@ then
 		sudo certbot certonly --dns-cloudflare --dns-cloudflare-credentials /home/$username/cfcred/cf-api-token.ini -d $fullhn -m $ssl_admin --agree-tos -n
         if [ -f /etc/letsencrypt/live/$fullhn/fullchain.pem ]
         then
-            print "Copying certs for $fullhn"
+            printf "Copying certs for $fullhn"
             mkdir -p $certdir
             bash -c "cat /etc/letsencrypt/live/$fullhn/fullchain.pem /etc/letsencrypt/live/$fullhn/privkey.pem >$certdir/$fullhn.cert"
             bash -c "cat /etc/letsencrypt/live/$fullhn/fullchain.pem >$certdir/$fullhn-fullchain.cert"

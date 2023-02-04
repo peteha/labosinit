@@ -1,16 +1,6 @@
 #!/bin/bash
 echo "## Setting Up OS Build Directory ##"
 # Create Base DIR
-mkdir -p /opt/osbuild
-cd /opt/osbuild || exit
-
-## Install host build file
-
-if [ ! -f build.sh ]; then
-    echo "## No hostbuild.env file available ##"
-    curl -fs "https://raw.githubusercontent.com/peteha/labosinit/main/hostbuild.env" --output build.sh
-    ## nano hostbuild.env
-fi
 
 ## Load hostbuild variables
 

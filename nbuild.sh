@@ -8,13 +8,13 @@ cd /opt/osbuild || exit
 
 if [ ! -f build.sh ]; then
     echo "## No hostbuild.env file available ##"
-    curl -fs "https://raw.githubusercontent.com/peteha/labosinit/main/hostbuild.env --output build.sh"
+    curl -fs "https://raw.githubusercontent.com/peteha/labosinit/main/hostbuild.env" --output build.sh
     ## nano hostbuild.env
 fi
 
 ## Load hostbuild variables
 
-source hostbuild.env
+source build.sh
 
 ## Establish user credentials
 
@@ -76,9 +76,12 @@ fi
 echo
 echo "Updating apt"
 apt update
-if [ -z "${!inst_pkgs}" ]; then
-  echo "## Package list does not exist ##"
-else
+# shellcheck disable=SC2070
+if [[ -n ${inst_pkgs} ]]; then
   apt install $inst_pkgs -y
+else
+  echo "## Install Packages not defined ##"
 fi
+apt upgrade -y
+reboot
 

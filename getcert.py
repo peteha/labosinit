@@ -1,11 +1,13 @@
 import certbot.main
 import os
 
+
+
 emailadd = "admin@pggb.net"
 fullhostname = "pi3.pggb.net"
-cfcredir = "/root/cfcred/cf-api-token.ini"
+_cfcredir = "/root/cfcred/cf-api-token.ini"
 
-if os.path.exists(_cfcredir, _addr, _fhn):
+if os.path.exists(_cfcredir):
     certbot.main.main([
         "--non-interactive",
         "--agree-tos",

@@ -70,7 +70,7 @@ else
 fi
 echo
 echo "Updating apt"
-$DISTRIB_RELEASE=${DISTRIB_RELEASE}
+$DISTRIB_RELEASE=$((DISTRIB_RELEASE))
 if [ $DISTRIB_RELEASE -gt 22 ]; then
   ## Removing Restart from Updates ##
   sed -i 's/#$nrconf{restart} = '"'"'i'"'"';/$nrconf{restart} = '"'"'a'"'"';/g' /etc/needrestart/needrestart.conf

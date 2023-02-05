@@ -71,9 +71,11 @@ fi
 echo
 echo "Updating apt"
 declare -f rel
+declare -f baserel
+baserel=$baserelease
 rel=$DISTRIB_RELEASE
 
-if [ $rel -gt 22 ]; then
+if (( $(echo "$baserel > $rel" | bc -l) )); then
   ## Removing Restart from Updates ##
   sed -i 's/#$nrconf{restart} = '"'"'i'"'"';/$nrconf{restart} = '"'"'a'"'"';/g' /etc/needrestart/needrestart.conf
 fi

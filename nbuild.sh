@@ -78,6 +78,7 @@ rel=$DISTRIB_RELEASE
 if (( $(echo "$baserel < $rel" | bc -l) )); then
   echo "## Removing Restart from Updates ##"
   sed -i 's/#$nrconf{restart} = '"'"'i'"'"';/$nrconf{restart} = '"'"'a'"'"';/g' /etc/needrestart/needrestart.conf
+  sed -i "s/#\$nrconf{kernelhints} = -1;/\$nrconf{kernelhints} = -1;/g" /etc/needrestart/needrestart.conf
 fi
 
 echo "## APT Update ##"
@@ -91,5 +92,8 @@ else
 fi
 echo "## APT Upgrade ##"
 apt upgrade -y
+sudo apt clean
+reboot
+
 
 

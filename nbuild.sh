@@ -70,14 +70,21 @@ else
 fi
 echo
 echo "Updating apt"
-NEEDRESTART_MODE=a
+if [ $DISTRIB_RELEASE > 22 ]; then
+  ## Removing Restart from Updates ##
+  sed -i 's/#$nrconf{restart} = '"'"'i'"'"';/$nrconf{restart} = '"'"'a'"'"';/g' /etc/needrestart/needrestart.conf
+fi
+
+echo "## APT Update ##"
 apt update
 # shellcheck disable=SC2070
+echo "## pkgs being installed ##"
 if [[ -n ${inst_pkgs} ]]; then
   apt install $inst_pkgs -y
 else
   echo "## Install Packages not defined ##"
 fi
+echo "## APT Upgrade ##"
 apt upgrade -y
-reboot
+
 

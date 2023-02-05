@@ -76,7 +76,7 @@ baserel=$baserelease
 rel=$DISTRIB_RELEASE
 
 if (( $(echo "$baserel < $rel" | bc -l) )); then
-  ## Removing Restart from Updates ##
+  echo "## Removing Restart from Updates ##"
   sed -i 's/#$nrconf{restart} = '"'"'i'"'"';/$nrconf{restart} = '"'"'a'"'"';/g' /etc/needrestart/needrestart.conf
 fi
 

@@ -70,7 +70,7 @@ else
 fi
 echo
 echo "Updating apt"
-declare -i rel
+declare -f rel
 rel=$DISTRIB_RELEASE
 
 if [ $rel -gt 22 ]; then

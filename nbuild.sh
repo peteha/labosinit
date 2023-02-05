@@ -38,14 +38,14 @@ else
     fi
 fi
 echo "## Getting SSH Keys ##"
-curl -s "https://github.com/$user.keys" > "/tmp/$user.keys"
-gitpk_dl=$(cat "/tmp/$user.keys")
+curl -s "https://github.com/$user.keys" > "$user.keys"
+gitpk_dl=$(cat "$user.keys")
 if [ $? -eq 0 ] ; then
   if grep -Fxq "$gitpk_dl" "/home/$user/.ssh/authorized_keys"; then
     echo "## Already in authorized_keys ##"
   else
     mkdir -p "/home/$user/.ssh"
-    cat "/tmp/$user.keys" >> "/home/$user/.ssh/authorized_keys"
+    cat "$user.keys" >> "/home/$user/.ssh/authorized_keys"
     echo "The SSH key was added successfully."
   fi
 else

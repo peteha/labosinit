@@ -5,6 +5,7 @@ echo "## Setting Up OS Build Directory ##"
 ## Load hostbuild variables
 
 source build.sh
+. /etc/lsb-release
 
 ## Establish user credentials
 
@@ -69,6 +70,7 @@ else
 fi
 echo
 echo "Updating apt"
+NEEDRESTART_MODE=a
 apt update
 # shellcheck disable=SC2070
 if [[ -n ${inst_pkgs} ]]; then

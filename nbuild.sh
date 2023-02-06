@@ -81,6 +81,14 @@ if (( $(echo "$baserel < $rel" | bc -l) )); then
   sed -i "s/#\$nrconf{kernelhints} = -1;/\$nrconf{kernelhints} = -1;/g" /etc/needrestart/needrestart.conf
 fi
 
+if [ "$(uname -s)" == "aarch64" ]; then
+  if [ $DISTRIB_CODENAME == "jammy" ]; then
+    echo "## Setting better mirror for aarch64 Ubuntu ##"
+    sed -i 's,http://ports.ubuntu.com/ubuntu-ports,https://mirrors.ocf.berkeley.edu/ubuntu-ports,g' /etc/apt/sources.list
+  fi
+fi
+
+
 echo "## APT Update ##"
 apt update
 # shellcheck disable=SC2070

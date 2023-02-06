@@ -5,7 +5,7 @@ echo "## Setting Up OS Build Directory ##"
 ## Load hostbuild variables
 
 source build.sh
-. /etc/lsb-release
+. /etc/os-release
 
 ## Establish user credentials
 
@@ -72,7 +72,7 @@ echo
 echo "Updating apt"
 
 if [ "$(uname -m)" == "aarch64" ]; then
-  if [ "$DISTRIB_CODENAME" == "jammy" ]; then
+  if [ "$VERSION_CODENAME" == "jammy" ]; then
     echo "## Setting better mirror for aarch64 Ubuntu ##"
     sed -i 's,http://ports.ubuntu.com/ubuntu-ports,https://mirrors.ocf.berkeley.edu/ubuntu-ports,g' /etc/apt/sources.list
     echo "## Removing Restart from Updates ##"

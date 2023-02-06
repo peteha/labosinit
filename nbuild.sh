@@ -82,7 +82,6 @@ if (( $(echo "$baserel < $rel" | bc -l) )); then
 fi
 
 if [ "$(uname -m)" == "aarch64" ]; then
-  echo "Jammy"
   if [ "$DISTRIB_CODENAME" == "jammy" ]; then
     echo "## Setting better mirror for aarch64 Ubuntu ##"
     sed -i 's,http://ports.ubuntu.com/ubuntu-ports,https://mirrors.ocf.berkeley.edu/ubuntu-ports,g' /etc/apt/sources.list

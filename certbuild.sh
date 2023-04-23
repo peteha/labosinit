@@ -12,10 +12,11 @@ then
     fi
 	certs="/opt/certs/certlist"
     certlines=$(cat $certs)
+    echo -n "Cert Admin: "
+    read ssl_admin
     for line in $certlines
     do
 		echo "## Creating Key for Host $line ##"
-        ssl_admin="admin@pggb.net"
 		sudo certbot certonly --dns-cloudflare --dns-cloudflare-credentials /home/peteha/cfcred/cf-api-token.ini -d $line -m $ssl_admin --agree-tos -n
         if [ -f /etc/letsencrypt/live/$line/fullchain.pem ]
         then

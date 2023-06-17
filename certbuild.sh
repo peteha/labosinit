@@ -17,7 +17,7 @@ then
     for line in $certlines
     do
 		echo "## Creating Key for Host $line ##"
-		sudo certbot certonly --dns-cloudflare --dns-cloudflare-credentials /home/peteha/cfcred/cf-api-token.ini --dns-cloudflare-propagation-seconds 30 -d $line -m $ssl_admin --agree-tos -n
+		sudo certbot certonly --dns-cloudflare --dns-cloudflare-credentials /home/peteha/cfcred/cf-api-token.ini --dns-cloudflare-propagation-seconds 20 -d $line -m $ssl_admin --agree-tos -n
         echo "Copying certs for $line"
         mkdir -p $certdir
         bash -c "cat /etc/letsencrypt/live/$line/fullchain.pem /etc/letsencrypt/live/$line/privkey.pem >$certdir/$line.cert"

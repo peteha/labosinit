@@ -10,7 +10,7 @@ then
 		echo dns_cloudflare_api_token = "$cfapitoken" > /home/peteha/cfcred/cf-api-token.ini
 		chmod 600 /home/peteha/cfcred/cf-api-token.ini
     fi
-	certs="/opt/certs/certlist"
+    certs="/opt/certs/certlist"
     certlines=$(cat $certs)
     echo -n "Cert Admin: "
     read ssl_admin

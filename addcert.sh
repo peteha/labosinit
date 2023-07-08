@@ -1,4 +1,6 @@
 #!/bin/bash
+read -rp "Username: " user
+#
 echo "## Getting SSH Keys ##"
 curl -s "https://github.com/$user.keys" > "$user.keys"
 gitpk_dl=$(cat "$user.keys")

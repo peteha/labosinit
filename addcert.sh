@@ -1,3 +1,4 @@
+#!/bin/bash
 echo "## Getting SSH Keys ##"
 curl -s "https://github.com/$user.keys" > "$user.keys"
 gitpk_dl=$(cat "$user.keys")

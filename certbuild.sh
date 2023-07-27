@@ -21,8 +21,6 @@ then
     echo $certadmin
     certs="/opt/certs/certlist"
     certlines=$(cat $certs)
-    
-    read ssl_admin
     for line in $certlines
     do
 		echo "## Creating Key for Host $line ##"

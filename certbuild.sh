@@ -91,8 +91,9 @@ if [ -f "$CERT_DIR/certlist" ]; then
         # Construct the certbot -d arguments dynamically
         certbot_args=""
         for domain in "${domains[@]}"; do
-            certbot_args="$certbot_args -d $domain"
+            certbot_args+=" -d $domain"
         done
+
         echo $certbot_args
         log "Creating certificate for: ${domains[*]}"
         ## sudo certbot certonly --dns-cloudflare --dns-cloudflare-credentials /home/peteha/cfcred/cf-api-token.ini --dns-cloudflare-propagation-seconds 20 $certbot_args -m $CERT_ADMIN --agree-tos -n | tee -a "$LOG_FILE"

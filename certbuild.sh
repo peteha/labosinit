@@ -104,8 +104,15 @@ if [ -f "$CERT_DIR/certlist" ]; then
 
         log "Running certbot with the following domains: ${domains[*]}"
 
-        # Run certbot and capture its output
-        certbot_output=$(sudo certbot certonly --dns-cloudflare --dns-cloudflare-credentials /home/peteha/cfcred/cf-api-token.ini --dns-cloudflare-propagation-seconds 20 $certbot_args -m $CERT_ADMIN --agree-tos -n 2>&1 | tee -a "$LOG_FILE")
+        # Construct the certbot command
+        certbot_command="sudo certbot certonly --dns-cloudflare --dns-cloudflare-credentials /home/peteha/cfcred/cf-api-token.ini --dns-cloudflare-propagation-seconds 20 $certbot_args -m $CERT_ADMIN --agree-tos -n"
+
+        # Output the command to the screen
+        log "About to run the following certbot command:"
+        echo "$certbot_command" | tee -a "$LOG_FILE"
+
+        # Run the certbot command and capture its output
+        certbot_output=$($certbot_command 2>&1 | tee -a "$LOG_FILE")
 
         # Extract the directory path where certbot saved the certificates
         full_path=$(echo "$certbot_output" | grep -oP '(?<=Certificate is saved at: ).*fullchain\.pem' | head -n 1)

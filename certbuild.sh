@@ -111,12 +111,18 @@ if [ -f "$CERT_DIR/certlist" ]; then
         log "About to run the following certbot command:"
         echo "$certbot_command" | tee -a "$LOG_FILE"
 
-        # Run the certbot command and output its results to the screen and log
+        # Run the certbot command and capture its output
         log "Running certbot..."
         certbot_output=$($certbot_command 2>&1 | tee -a "$LOG_FILE")
 
         # Output the result to the screen
         echo "$certbot_output"
+
+        # Check if certificate is not up for renewal
+        if echo "$certbot_output" | grep -q "Certificate not yet due for renewal"; then
+            log "Certificate is not due for renewal. Skipping certificate copying for this domain."
+            continue
+        fi
 
         # Extract the directory path where certbot saved the certificates
         full_path=$(echo "$certbot_output" | grep -oP '(?<=Certificate is saved at: ).*fullchain\.pem' | head -n 1)
@@ -129,7 +135,7 @@ if [ -f "$CERT_DIR/certlist" ]; then
 
         log "Certificate directory determined: $cert_dir_path"
 
-        # Use the extracted directory to copy certificates
+        # Only run the cat commands if the certificate is renewed
         main_domain=${domains[0]#*.}
         log "Copying certificates to $CERT_DIR for domain: $main_domain"
         mkdir -p "$CERT_DIR"

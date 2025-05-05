@@ -93,22 +93,22 @@ if [ -f "$CERT_DIR/certlist" ]; then
         for domain in "${domains[@]}"; do
             certbot_args="$certbot_args -d $domain"
         done
-
+        echo $certbot_args
         log "Creating certificate for: ${domains[*]}"
-        sudo certbot certonly --dns-cloudflare --dns-cloudflare-credentials /home/peteha/cfcred/cf-api-token.ini --dns-cloudflare-propagation-seconds 20 $certbot_args -m $CERT_ADMIN --agree-tos -n | tee -a "$LOG_FILE"
+        ## sudo certbot certonly --dns-cloudflare --dns-cloudflare-credentials /home/peteha/cfcred/cf-api-token.ini --dns-cloudflare-propagation-seconds 20 $certbot_args -m $CERT_ADMIN --agree-tos -n | tee -a "$LOG_FILE"
 
         # Use the first domain for output naming
         main_domain=${domains[0]#*.}
 
         log "Copying certificates to $CERT_DIR for domain: $main_domain"
-        mkdir -p "$CERT_DIR"
-        bash -c "cat /etc/letsencrypt/live/${domains[0]}/fullchain.pem /etc/letsencrypt/live/${domains[0]}/privkey.pem >$CERT_DIR/$main_domain.cert"
-        bash -c "cat /etc/letsencrypt/live/${domains[0]}/fullchain.pem >$CERT_DIR/$main_domain-fullchain.cert"
-        bash -c "cat /etc/letsencrypt/live/${domains[0]}/privkey.pem >$CERT_DIR/$main_domain-privkey.key"
-        log "Setting ownership and permissions for copied certificates"
-        chown -R "$CURRENT_USER":"$CURRENT_USER" "$CERT_DIR"
-        chmod -R 755 "$CERT_DIR"
-        log "Certificates copied for $main_domain"
+        #mkdir -p "$CERT_DIR"
+        #bash -c "cat /etc/letsencrypt/live/${domains[0]}/fullchain.pem /etc/letsencrypt/live/${domains[0]}/privkey.pem >$CERT_DIR/$main_domain.cert"
+        #bash -c "cat /etc/letsencrypt/live/${domains[0]}/fullchain.pem >$CERT_DIR/$main_domain-fullchain.cert"
+        #bash -c "cat /etc/letsencrypt/live/${domains[0]}/privkey.pem >$CERT_DIR/$main_domain-privkey.key"
+        #log "Setting ownership and permissions for copied certificates"
+        #chown -R "$CURRENT_USER":"$CURRENT_USER" "$CERT_DIR"
+        #chmod -R 755 "$CERT_DIR"
+        #log "Certificates copied for $main_domain"
     done
 else
     log "No certlist file found in $CERT_DIR; exiting script."

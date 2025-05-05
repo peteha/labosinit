@@ -3,6 +3,7 @@
 LOG_DIR="/var/log/certbot"
 LOG_FILE="$LOG_DIR/certbot.log"
 TIMESTAMP=$(date "+%Y-%m-%d %H:%M:%S")
+CURRENT_USER=$(whoami)
 
 # Ensure the log directory exists
 if [ ! -d "$LOG_DIR" ]; then
@@ -44,14 +45,17 @@ else
     log "CERT_ADMIN loaded: $CERT_ADMIN"
 fi
 
-# Ensure CERT_DIR exists
+# Ensure CERT_DIR exists and has correct permissions
 if [ ! -d "$CERT_DIR" ]; then
-    log "CERT_DIR does not exist; creating it at $CERT_DIR"
+    log "CERT_DIR does not exist; creating directory at $CERT_DIR"
     mkdir -p "$CERT_DIR"
-    chmod 755 "$CERT_DIR"
 else
     log "CERT_DIR exists: $CERT_DIR"
 fi
+
+log "Setting read/write permissions for CERT_DIR"
+chown -R "$CURRENT_USER":"$CURRENT_USER" "$CERT_DIR"
+chmod -R 755 "$CERT_DIR"
 
 if [ -f "$CERT_DIR/certlist" ]; then
     log "certlist file found at $CERT_DIR/certlist"
@@ -101,7 +105,9 @@ if [ -f "$CERT_DIR/certlist" ]; then
         bash -c "cat /etc/letsencrypt/live/${domains[0]}/fullchain.pem /etc/letsencrypt/live/${domains[0]}/privkey.pem >$CERT_DIR/$main_domain.cert"
         bash -c "cat /etc/letsencrypt/live/${domains[0]}/fullchain.pem >$CERT_DIR/$main_domain-fullchain.cert"
         bash -c "cat /etc/letsencrypt/live/${domains[0]}/privkey.pem >$CERT_DIR/$main_domain-privkey.key"
-        chown -R $username:$username "$CERT_DIR"
+        log "Setting ownership and permissions for copied certificates"
+        chown -R "$CURRENT_USER":"$CURRENT_USER" "$CERT_DIR"
+        chmod -R 755 "$CERT_DIR"
         log "Certificates copied for $main_domain"
     done
 else

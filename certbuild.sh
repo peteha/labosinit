@@ -81,7 +81,7 @@ if [ -f "$CERT_DIR/certlist" ]; then
     source "$CERT_DIR/certadmin.env"
     log "Loaded CERT_ADMIN: $CERT_ADMIN"
 
-        certs="$CERT_DIR/certlist"
+    certs="$CERT_DIR/certlist"
     while read -r line; do
         # Skip empty lines
         if [[ -z "$line" ]]; then
@@ -103,16 +103,27 @@ if [ -f "$CERT_DIR/certlist" ]; then
         certbot_args=$(echo "$certbot_args" | sed 's/^[ \t]*//')
 
         log "Running certbot with the following domains: ${domains[*]}"
-        sudo certbot certonly --dns-cloudflare --dns-cloudflare-credentials /home/peteha/cfcred/cf-api-token.ini --dns-cloudflare-propagation-seconds 20 $certbot_args -m $CERT_ADMIN --agree-tos -n --expand | tee -a "$LOG_FILE"
 
-        # Use the first domain for output naming
+        # Run certbot and capture its output
+        certbot_output=$(sudo certbot certonly --dns-cloudflare --dns-cloudflare-credentials /home/peteha/cfcred/cf-api-token.ini --dns-cloudflare-propagation-seconds 20 $certbot_args -m $CERT_ADMIN --agree-tos -n 2>&1 | tee -a "$LOG_FILE")
+
+        # Extract the directory path where certbot saved the certificates
+        cert_dir_path=$(echo "$certbot_output" | grep -oP '(?<=/etc/letsencrypt/live/)[^ ]+' | head -n 1)
+
+        if [[ -z "$cert_dir_path" ]]; then
+            log "Failed to determine the certificate directory from certbot output. Skipping $line."
+            continue
+        fi
+
+        log "Certificate directory determined: /etc/letsencrypt/live/$cert_dir_path"
+
+        # Use the extracted directory to copy certificates
         main_domain=${domains[0]#*.}
-
         log "Copying certificates to $CERT_DIR for domain: $main_domain"
         mkdir -p "$CERT_DIR"
-        bash -c "cat /etc/letsencrypt/live/${domains[0]}/fullchain.pem /etc/letsencrypt/live/${domains[0]}/privkey.pem >$CERT_DIR/$main_domain.cert"
-        bash -c "cat /etc/letsencrypt/live/${domains[0]}/fullchain.pem >$CERT_DIR/$main_domain-fullchain.cert"
-        bash -c "cat /etc/letsencrypt/live/${domains[0]}/privkey.pem >$CERT_DIR/$main_domain-privkey.key"
+        bash -c "cat /etc/letsencrypt/live/$cert_dir_path/fullchain.pem /etc/letsencrypt/live/$cert_dir_path/privkey.pem >$CERT_DIR/$main_domain.cert"
+        bash -c "cat /etc/letsencrypt/live/$cert_dir_path/fullchain.pem >$CERT_DIR/$main_domain-fullchain.cert"
+        bash -c "cat /etc/letsencrypt/live/$cert_dir_path/privkey.pem >$CERT_DIR/$main_domain-privkey.key"
         log "Setting ownership and permissions for certificates in $CERT_DIR"
         chown -R "$CURRENT_USER":"$CURRENT_USER" "$CERT_DIR"
         chmod -R 755 "$CERT_DIR"

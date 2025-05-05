@@ -81,11 +81,16 @@ if [ -f "$CERT_DIR/certlist" ]; then
     source "$CERT_DIR/certadmin.env"
     log "Loaded CERT_ADMIN: $CERT_ADMIN"
 
-    certs="$CERT_DIR/certlist"
-    certlines=$(cat $certs)
-    for line in $certlines; do
+        certs="$CERT_DIR/certlist"
+    while read -r line; do
+        # Skip empty lines
+        if [[ -z "$line" ]]; then
+            continue
+        fi
+
+        log "Processing line from certlist: $line"
+
         # Split the line into an array of domains
-        log "Processing line: $line"
         IFS=' ' read -r -a domains <<< "$line"
 
         # Construct the certbot -d arguments dynamically
@@ -94,23 +99,26 @@ if [ -f "$CERT_DIR/certlist" ]; then
             certbot_args+=" -d $domain"
         done
 
-        echo $certbot_args
-        log "Creating certificate for: ${domains[*]}"
-        ## sudo certbot certonly --dns-cloudflare --dns-cloudflare-credentials /home/peteha/cfcred/cf-api-token.ini --dns-cloudflare-propagation-seconds 20 $certbot_args -m $CERT_ADMIN --agree-tos -n | tee -a "$LOG_FILE"
+        # Remove leading whitespace from certbot_args (in case there's any)
+        certbot_args=$(echo "$certbot_args" | sed 's/^[ \t]*//')
+
+        log "Running certbot with the following domains: ${domains[*]}"
+        sudo certbot certonly --dns-cloudflare --dns-cloudflare-credentials /home/peteha/cfcred/cf-api-token.ini --dns-cloudflare-propagation-seconds 20 $certbot_args -m $CERT_ADMIN --agree-tos -n | tee -a "$LOG_FILE"
 
         # Use the first domain for output naming
         main_domain=${domains[0]#*.}
 
         log "Copying certificates to $CERT_DIR for domain: $main_domain"
-        #mkdir -p "$CERT_DIR"
-        #bash -c "cat /etc/letsencrypt/live/${domains[0]}/fullchain.pem /etc/letsencrypt/live/${domains[0]}/privkey.pem >$CERT_DIR/$main_domain.cert"
-        #bash -c "cat /etc/letsencrypt/live/${domains[0]}/fullchain.pem >$CERT_DIR/$main_domain-fullchain.cert"
-        #bash -c "cat /etc/letsencrypt/live/${domains[0]}/privkey.pem >$CERT_DIR/$main_domain-privkey.key"
-        #log "Setting ownership and permissions for copied certificates"
-        #chown -R "$CURRENT_USER":"$CURRENT_USER" "$CERT_DIR"
-        #chmod -R 755 "$CERT_DIR"
-        #log "Certificates copied for $main_domain"
-    done
+        mkdir -p "$CERT_DIR"
+        bash -c "cat /etc/letsencrypt/live/${domains[0]}/fullchain.pem /etc/letsencrypt/live/${domains[0]}/privkey.pem >$CERT_DIR/$main_domain.cert"
+        bash -c "cat /etc/letsencrypt/live/${domains[0]}/fullchain.pem >$CERT_DIR/$main_domain-fullchain.cert"
+        bash -c "cat /etc/letsencrypt/live/${domains[0]}/privkey.pem >$CERT_DIR/$main_domain-privkey.key"
+        log "Setting ownership and permissions for certificates in $CERT_DIR"
+        chown -R "$CURRENT_USER":"$CURRENT_USER" "$CERT_DIR"
+        chmod -R 755 "$CERT_DIR"
+
+        log "Certificates copied and permissions updated for $main_domain"
+    done < "$certs"
 else
     log "No certlist file found in $CERT_DIR; exiting script."
     exit 1

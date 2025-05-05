@@ -103,7 +103,7 @@ if [ -f "$CERT_DIR/certlist" ]; then
         certbot_args=$(echo "$certbot_args" | sed 's/^[ \t]*//')
 
         log "Running certbot with the following domains: ${domains[*]}"
-        sudo certbot certonly --dns-cloudflare --dns-cloudflare-credentials /home/peteha/cfcred/cf-api-token.ini --dns-cloudflare-propagation-seconds 20 $certbot_args -m $CERT_ADMIN --agree-tos -n | tee -a "$LOG_FILE"
+        sudo certbot certonly --dns-cloudflare --dns-cloudflare-credentials /home/peteha/cfcred/cf-api-token.ini --dns-cloudflare-propagation-seconds 20 $certbot_args -m $CERT_ADMIN --agree-tos -n --expand | tee -a "$LOG_FILE"
 
         # Use the first domain for output naming
         main_domain=${domains[0]#*.}

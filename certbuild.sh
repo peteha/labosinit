@@ -108,22 +108,23 @@ if [ -f "$CERT_DIR/certlist" ]; then
         certbot_output=$(sudo certbot certonly --dns-cloudflare --dns-cloudflare-credentials /home/peteha/cfcred/cf-api-token.ini --dns-cloudflare-propagation-seconds 20 $certbot_args -m $CERT_ADMIN --agree-tos -n 2>&1 | tee -a "$LOG_FILE")
 
         # Extract the directory path where certbot saved the certificates
-        cert_dir_path=$(echo "$certbot_output" | grep -oP '(?<=/etc/letsencrypt/live/)[^ ]+' | head -n 1)
+        full_path=$(echo "$certbot_output" | grep -oP '(?<=Certificate is saved at: ).*fullchain\.pem' | head -n 1)
+        cert_dir_path=$(dirname "$full_path")
 
         if [[ -z "$cert_dir_path" ]]; then
             log "Failed to determine the certificate directory from certbot output. Skipping $line."
             continue
         fi
 
-        log "Certificate directory determined: /etc/letsencrypt/live/$cert_dir_path"
+        log "Certificate directory determined: $cert_dir_path"
 
         # Use the extracted directory to copy certificates
         main_domain=${domains[0]#*.}
         log "Copying certificates to $CERT_DIR for domain: $main_domain"
         mkdir -p "$CERT_DIR"
-        bash -c "cat /etc/letsencrypt/live/$cert_dir_path/fullchain.pem /etc/letsencrypt/live/$cert_dir_path/privkey.pem >$CERT_DIR/$main_domain.cert"
-        bash -c "cat /etc/letsencrypt/live/$cert_dir_path/fullchain.pem >$CERT_DIR/$main_domain-fullchain.cert"
-        bash -c "cat /etc/letsencrypt/live/$cert_dir_path/privkey.pem >$CERT_DIR/$main_domain-privkey.key"
+        bash -c "cat $cert_dir_path/fullchain.pem $cert_dir_path/privkey.pem >$CERT_DIR/$main_domain.cert"
+        bash -c "cat $cert_dir_path/fullchain.pem >$CERT_DIR/$main_domain-fullchain.cert"
+        bash -c "cat $cert_dir_path/privkey.pem >$CERT_DIR/$main_domain-privkey.key"
         log "Setting ownership and permissions for certificates in $CERT_DIR"
         chown -R "$CURRENT_USER":"$CURRENT_USER" "$CERT_DIR"
         chmod -R 755 "$CERT_DIR"

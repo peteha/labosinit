@@ -1,4 +1,6 @@
 
+k8_params=$(jq -r '.k8_params' "$CONFIG_FILE")
+
 #!/bin/bash
 
 # Usage:
@@ -6,180 +8,154 @@
 #
 # This script requires config.json in the same directory. If missing, it will be downloaded automatically.
 
-## Setting Up OS Build Directory ##
+set -euo pipefail
 
-# Ensure jq is installed
-echo "## Checking if jq is installed... ##"
-
-# Check if jq is not installed
-if ! command -v jq >/dev/null 2>&1; then
-  echo "## jq is not installed. Installing jq... ##"
-
-  # Attempt to update package list and install jq
-  if sudo apt-get update && sudo apt-get install -y jq; then
-    echo "## jq successfully installed. ##"
-  else
-    # Print an error message and exit if the installation fails
-    echo "## Failed to install jq. Please install it manually and re-run the script. ##"
-    exit 1
-  fi
-else
-  echo "## jq is already installed. Proceeding... ##"
-fi
-
-# Load configuration from JSON file
-CONFIG_FILE="config.json"
-
-
-# Check if the config file exists, if not, download it from GitHub
-if [ ! -f "$CONFIG_FILE" ]; then
-  echo "## Configuration file $CONFIG_FILE not found. Attempting to download from GitHub... ##"
-  curl -fsSL -o "$CONFIG_FILE" "https://raw.githubusercontent.com/peteha/labosinit/main/config.json"
-  if [ $? -ne 0 ]; then
-    echo "## Failed to download $CONFIG_FILE. Please create it manually. ##"
-    exit 1
-  else
-    echo "## Downloaded $CONFIG_FILE from GitHub. ##"
-  fi
-fi
-
-# Parse values from JSON using jq
-inst_pkgs=$(jq -r '.inst_pkgs' "$CONFIG_FILE")
-bootfile=$(jq -r '.bootfile' "$CONFIG_FILE")
-k8_params=$(jq -r '.k8_params' "$CONFIG_FILE")
-
-# Validate the parsed values
-if [[ -z "$inst_pkgs" || -z "$bootfile" || -z "$k8_params" ]]; then
-  echo "## Missing required configuration values in $CONFIG_FILE. Please check the file. ##"
-  exit 1
-fi
-
-# Define color codes
+# Color codes
 GREEN="\033[1;32m"
 CYAN="\033[1;36m"
 RED="\033[1;31m"
+YELLOW="\033[1;33m"
 RESET="\033[0m"
 
-# Prompt for user credentials with color
-echo -e "${CYAN}## Please enter your credentials ##${RESET}"
-read -rp "$(echo -e ${GREEN}Username:${RESET}) " user
-read -rsp "$(echo -e ${GREEN}Password:${RESET}) " password
-echo -e "\n${CYAN}## Thank you! Proceeding... ##${RESET}"
+CONFIG_FILE="config.json"
+GITHUB_REPO="peteha/labosinit"
 
-if id "$user" >/dev/null 2>&1; then
-  echo -e "\n${RED}## User $user already exists. ##${RESET}"
+function error_exit {
+  echo -e "${RED}Error: $1${RESET}" >&2
+  exit 1
+}
 
-  # Prompt to change password for existing user
-  read -rp "$(echo -e ${CYAN}## Change existing user password? (default: Y): ${RESET})" usrchg
-  usrchg=${usrchg:-Y}
-  usrchg=$(echo "$usrchg" | tr '[:lower:]' '[:upper:]')
+function ensure_jq_installed {
+  if ! command -v jq >/dev/null 2>&1; then
+    echo -e "${CYAN}## jq not found. Installing... ##${RESET}"
+    sudo apt-get update && sudo apt-get install -y jq || error_exit "Failed to install jq."
+  else
+    echo -e "${CYAN}## jq is already installed. ##${RESET}"
+  fi
+}
 
-  if [ "$usrchg" == "Y" ]; then
-    echo -e "${YELLOW}## Changing password for user $user... ##${RESET}"
+function ensure_config {
+  if [ ! -f "$CONFIG_FILE" ]; then
+    echo -e "${CYAN}## $CONFIG_FILE not found. Downloading from GitHub... ##${RESET}"
+    curl -fsSL -o "$CONFIG_FILE" "https://raw.githubusercontent.com/$GITHUB_REPO/main/config.json" || error_exit "Could not download $CONFIG_FILE."
+    echo -e "${GREEN}## Downloaded $CONFIG_FILE. ##${RESET}"
+  fi
+}
+
+function parse_config {
+  inst_pkgs=$(jq -r '.inst_pkgs' "$CONFIG_FILE")
+  bootfile=$(jq -r '.bootfile' "$CONFIG_FILE")
+  k8_params=$(jq -r '.k8_params' "$CONFIG_FILE")
+  if [[ -z "$inst_pkgs" || -z "$bootfile" || -z "$k8_params" ]]; then
+    error_exit "Missing required configuration values in $CONFIG_FILE."
+  fi
+}
+
+function prompt_user_credentials {
+  echo -e "${CYAN}## Please enter your credentials ##${RESET}"
+  read -rp "$(echo -e ${GREEN}Username:${RESET}) " user
+  read -rsp "$(echo -e ${GREEN}Password:${RESET}) " password
+  echo -e "\n${CYAN}## Thank you! Proceeding... ##${RESET}"
+}
+
+function create_or_update_user {
+  if id "$user" >/dev/null 2>&1; then
+    echo -e "\n${YELLOW}## User $user already exists. ##${RESET}"
+    read -rp "$(echo -e ${CYAN}## Change existing user password? (default: Y): ${RESET})" usrchg
+    usrchg=${usrchg:-Y}
+    usrchg=$(echo "$usrchg" | tr '[:lower:]' '[:upper:]')
+    if [ "$usrchg" == "Y" ]; then
+      echo "$user:$password" | chpasswd
+      echo -e "${GREEN}## Password updated. ##${RESET}"
+    else
+      echo -e "${CYAN}## Password not changed. ##${RESET}"
+    fi
+  else
+    echo -e "${CYAN}## Creating user $user... ##${RESET}"
+    useradd "$user" --create-home --shell /bin/bash --groups sudo || error_exit "Failed to create user."
     echo "$user:$password" | chpasswd
-    echo -e "${GREEN}## Password successfully updated. ##${RESET}"
-  else
-    echo -e "${CYAN}## Password not changed. Proceeding... ##${RESET}"
+    echo -e "${GREEN}## User created. ##${RESET}"
   fi
-else
-  # Add new user
-  echo -e "${CYAN}## User $user does not exist. Adding user... ##${RESET}"
-  useradd "$user" --create-home --shell /bin/bash --groups sudo
-  echo "$user:$password" | chpasswd
 
-  # Configure sudo permissions
+  # Sudoers
   if ! grep -Fxq "$user ALL=(ALL) NOPASSWD: ALL" /etc/sudoers; then
-    echo -e "${YELLOW}## Adding $user to sudoers with no password requirement... ##${RESET}"
     echo "$user ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
-    echo -e "${GREEN}## User $user has been added to sudoers successfully. ##${RESET}"
-  else
-    echo -e "${CYAN}## User already has sudo privileges. ##${RESET}"
+    echo -e "${GREEN}## Sudoers updated. ##${RESET}"
   fi
-fi
+}
 
-# Configure SSH keys from GitHub
-echo "## Configuring SSH keys for user $user ##"
-curl -s "https://github.com/$user.keys" > "$user.keys"
-
-if [ $? -eq 0 ]; then
+function setup_ssh_keys {
+  echo -e "${CYAN}## Configuring SSH keys for $user ##${RESET}"
+  curl -fsSL "https://github.com/$user.keys" -o "/tmp/$user.keys" || error_exit "Could not fetch SSH keys from GitHub."
   ssh_dir="/home/$user/.ssh"
-  mkdir -p "$ssh_dir"
   auth_keys="$ssh_dir/authorized_keys"
-  # Ensure authorized_keys file exists
+  mkdir -p "$ssh_dir"
   touch "$auth_keys"
-
-  # Only add new keys that are not already present
-  if [ -s "$user.keys" ]; then
+  if [ -s "/tmp/$user.keys" ]; then
     while IFS= read -r key; do
       if ! grep -Fxq "$key" "$auth_keys" 2>/dev/null; then
         echo "$key" >> "$auth_keys"
-        echo "SSH key added successfully to authorized_keys."
-      else
-        echo "SSH key already exists in authorized_keys."
+        echo "SSH key added."
       fi
-    done < "$user.keys"
+    done < "/tmp/$user.keys"
   else
-    echo "No SSH keys found for user $user on GitHub."
+    echo -e "${YELLOW}No SSH keys found for $user on GitHub.${RESET}"
   fi
-
-  # Set proper permissions
   chown -R "$user:$user" "$ssh_dir"
   chmod 700 "$ssh_dir"
   chmod 600 "$auth_keys"
-else
-  echo "Failed to retrieve the SSH key. Please check your GitHub username."
-fi
+  rm -f "/tmp/$user.keys"
+}
 
-# Prompt and set hostname
-read -rp "Hostname: " hostname
-echo "## Setting hostname to $hostname ##"
-hostnamectl set-hostname "$hostname"
+function set_hostname {
+  read -rp "Hostname: " hostname
+  echo -e "${CYAN}## Setting hostname to $hostname ##${RESET}"
+  hostnamectl set-hostname "$hostname"
+}
 
-# Configure Kubernetes boot parameters
-echo "## Configuring Kubernetes parameters ##"
-if [ -f "$bootfile" ]; then
-  if ! grep -q "$k8_params" "$bootfile"; then
-    echo "Adding Kubernetes parameters to $bootfile..."
-    sed -i '$ s/$/ '"$k8_params"'/' "$bootfile"
-    echo "Kubernetes parameters added to $bootfile."
+function configure_k8s_boot {
+  echo -e "${CYAN}## Configuring Kubernetes parameters ##${RESET}"
+  if [ -f "$bootfile" ]; then
+    if ! grep -q "$k8_params" "$bootfile"; then
+      sed -i '$ s/$/ '"$k8_params"'/' "$bootfile"
+      echo "Kubernetes parameters added to $bootfile."
+    else
+      echo "Kubernetes parameters already exist in $bootfile."
+    fi
   else
-    echo "## Kubernetes parameters already exist in $bootfile ##"
+    echo -e "${YELLOW}Bootfile $bootfile not found.${RESET}"
   fi
-else
-  echo "## Bootfile not found ##"
-fi
+}
 
-# Update APT repositories
-echo "## Updating APT repositories ##"
+function apt_update_upgrade {
+  echo -e "${CYAN}## Updating APT repositories ##${RESET}"
+  if [ "$(uname -m)" == "aarch64" ] && grep -q jammy /etc/os-release 2>/dev/null; then
+    sed -i 's,http://ports.ubuntu.com/ubuntu-ports,https://mirrors.ocf.berkeley.edu/ubuntu-ports,g' /etc/apt/sources.list
+    sed -i 's/#$nrconf{restart} = '\''i'\'';/$nrconf{restart} = '\''a'\'';/g' /etc/needrestart/needrestart.conf || true
+    sed -i "s/#\$nrconf{kernelhints} = -1;/\$nrconf{kernelhints} = -1;/g" /etc/needrestart/needrestart.conf || true
+  fi
+  apt update
+  if [[ -n $inst_pkgs ]]; then
+    apt install -y $inst_pkgs
+  else
+    echo -e "${YELLOW}No packages specified for installation.${RESET}"
+  fi
+  apt upgrade -y
+  apt clean
+}
 
-# Special configuration for aarch64 with Ubuntu Jammy
-if [ "$(uname -m)" == "aarch64" ] && [ "$VERSION_CODENAME" == "jammy" ]; then
-  echo "## Setting a better mirror for aarch64 Ubuntu ##"
-  sed -i 's,http://ports.ubuntu.com/ubuntu-ports,https://mirrors.ocf.berkeley.edu/ubuntu-ports,g' /etc/apt/sources.list
+function main {
+  ensure_jq_installed
+  ensure_config
+  parse_config
+  prompt_user_credentials
+  create_or_update_user
+  setup_ssh_keys
+  set_hostname
+  configure_k8s_boot
+  apt_update_upgrade
+  echo -e "${GREEN}## System setup complete. Rebooting... ##${RESET}"
+  reboot
+}
 
-  echo "## Removing automatic restarts during updates ##"
-  sed -i 's/#$nrconf{restart} = '"'"'i'"'"';/$nrconf{restart} = '"'"'a'"'"';/g' /etc/needrestart/needrestart.conf
-  sed -i "s/#\$nrconf{kernelhints} = -1;/\$nrconf{kernelhints} = -1;/g" /etc/needrestart/needrestart.conf
-fi
-
-# Perform APT operations
-echo "## Running APT update ##"
-apt update
-
-echo "## Installing packages ##"
-if [[ -n $inst_pkgs ]]; then
-  apt install -y $inst_pkgs
-else
-  echo "## No packages specified for installation ##"
-fi
-
-echo "## Running APT upgrade ##"
-apt upgrade -y
-
-# Clean APT cache
-echo "## Cleaning APT cache ##"
-apt clean
-
-# Finishing up
-echo "## System setup complete. Rebooting... ##"
-reboot
+main

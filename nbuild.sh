@@ -105,7 +105,8 @@ if [ $? -eq 0 ]; then
   ssh_dir="/home/$user/.ssh"
   mkdir -p "$ssh_dir"
   auth_keys="$ssh_dir/authorized_keys"
-
+  # Ensure authorized_keys file exists
+  touch "$auth_keys"
 
   # Only add new keys that are not already present
   if [ -s "$user.keys" ]; then

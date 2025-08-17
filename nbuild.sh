@@ -129,11 +129,7 @@ function configure_k8s_boot {
 
 function apt_update_upgrade {
   echo -e "${CYAN}## Updating APT repositories ##${RESET}"
-  if [ "$(uname -m)" == "aarch64" ] && grep -q jammy /etc/os-release 2>/dev/null; then
-    sed -i 's,http://ports.ubuntu.com/ubuntu-ports,https://mirrors.ocf.berkeley.edu/ubuntu-ports,g' /etc/apt/sources.list
-    sed -i 's/#$nrconf{restart} = '\''i'\'';/$nrconf{restart} = '\''a'\'';/g' /etc/needrestart/needrestart.conf || true
-    sed -i "s/#\$nrconf{kernelhints} = -1;/\$nrconf{kernelhints} = -1;/g" /etc/needrestart/needrestart.conf || true
-  fi
+  # Ubuntu 24.04: No special aarch64/jammy logic needed
   apt update
   if [[ -n $inst_pkgs ]]; then
     apt install -y $inst_pkgs

@@ -6,5 +6,6 @@ Scripted process to build Debian based hosts.
 - Ubuntu 20+
 
 ```
-sudo /bin/bash -c "$(curl -fs https://raw.githubusercontent.com/peteha/labosinit/main/osinit.sh)"
+sudo /bin/bash -c "$(curl -fs https://raw.githubusercontent.com/peteha/labosinit/nbuild.sh)"
 ```
+

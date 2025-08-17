@@ -106,11 +106,19 @@ if [ $? -eq 0 ]; then
   mkdir -p "$ssh_dir"
   auth_keys="$ssh_dir/authorized_keys"
 
-  if grep -Fxq "$(cat "$user.keys")" "$auth_keys"; then
-    echo "SSH key already exists in authorized_keys."
+
+  # Only add new keys that are not already present
+  if [ -s "$user.keys" ]; then
+    while IFS= read -r key; do
+      if ! grep -Fxq "$key" "$auth_keys" 2>/dev/null; then
+        echo "$key" >> "$auth_keys"
+        echo "SSH key added successfully to authorized_keys."
+      else
+        echo "SSH key already exists in authorized_keys."
+      fi
+    done < "$user.keys"
   else
-    cat "$user.keys" >> "$auth_keys"
-    echo "SSH key added successfully to authorized_keys."
+    echo "No SSH keys found for user $user on GitHub."
   fi
 
   # Set proper permissions

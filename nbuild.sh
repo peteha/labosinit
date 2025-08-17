@@ -1,4 +1,10 @@
+
 #!/bin/bash
+
+# Usage:
+#   bash <(curl -s https://raw.githubusercontent.com/peteha/labosinit/main/nbuild.sh)
+#
+# This script requires config.json in the same directory. If missing, it will be downloaded automatically.
 
 ## Setting Up OS Build Directory ##
 
@@ -24,10 +30,17 @@ fi
 # Load configuration from JSON file
 CONFIG_FILE="config.json"
 
-# Check if the config file exists
+
+# Check if the config file exists, if not, download it from GitHub
 if [ ! -f "$CONFIG_FILE" ]; then
-  echo "## Configuration file $CONFIG_FILE not found. Please create it with the required fields. ##"
-  exit 1
+  echo "## Configuration file $CONFIG_FILE not found. Attempting to download from GitHub... ##"
+  curl -fsSL -o "$CONFIG_FILE" "https://raw.githubusercontent.com/peteha/labosinit/main/config.json"
+  if [ $? -ne 0 ]; then
+    echo "## Failed to download $CONFIG_FILE. Please create it manually. ##"
+    exit 1
+  else
+    echo "## Downloaded $CONFIG_FILE from GitHub. ##"
+  fi
 fi
 
 # Parse values from JSON using jq
